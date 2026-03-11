@@ -1,0 +1,108 @@
+---
+title: "Data1018/2"
+author: "Blue"
+date: "2023-08-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+collinearity occurs when wrote aor mote predictors are heavily correlated to each other, increases uncertainty in coefficient variables
+
+can diagnose collinearity using Variance inflation facor
+VIF over 5 indicates a problematic amound of colinearity
+solutions: drop one of the collinear varibales with VIF>5 from the regression
+combine collinear variables together into a single predictor.
+
+VIF varianec inflation factor means how much the behaviour of a feature is influenced by it's relationship with other features. VIF is the coefficient estimate Bjhat/the variance of Bjhat
+VIF gives a sense of how much a variable is contributing to the standard error in the regression.
+
+
+
+```{r}
+library(tigris)
+library(ggplot2)
+library(dplyr)
+
+counties <- counties(state = "CA")
+roads <- roads(state = "CA",
+               county = "Santa Clara")
+school_districts <- school_districts(state = "CA")
+ca <- states() %>% 
+  filter(NAME == "California")
+
+ggplot(school_districts)+
+  geom_sf(data = ca)+
+  geom_sf()
+
+
+```
+
+```{r}
+library(readr)
+library(magrittr)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+
+aqi22<-read_csv("aqi22_clean_ca.csv")
+aqi22 %<>%
+  st_as_sf(coords = c("X","Y"))
+
+aqi22 %<>%
+  st_set_crs(st_crs(school_districts))
+aqi22 %<>%
+  filter(`Pollutant Standard` == "PM25 24-hour 2012" & 
+           `State Name` == "California")
+school_districts %<>%
+  st_join(aqi22)
+
+school_districts %<>%
+  group_by(GEOID)%>%
+  summarise(mn_aqi = mean('Arithmetic Mean', na.rm = T)
+
+ggplot(school_districts)+
+  geom_sf(data = ca)+
+  
+            
+
+  
+
+
+```
+
+```{r}
+#install.packages("leaflet")
+library(leaflet)
+m<- leaflet(data = aqi22)%>%
+  addTiles()%>%
+  addCircleMarkers(color = ~ ' ')
+
+
+
+```

@@ -1,0 +1,180 @@
+---
+title: "LAB 6 Submission sheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Modify this file only to add your answers. Please, do not delete any code from this file.
+
+```{r load-packages, message=FALSE}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("openintro")) install.packages("openintro")
+if(!require("infer")) install.packages("infer")
+library(tidyverse)
+library(openintro)
+library(infer)
+```
+
+```{r}
+no_helmet <- yrbss %>%
+  filter(helmet_12m == "never")
+
+no_helmet <- no_helmet %>%
+  mutate(text_ind = ifelse(text_while_driving_30d == "30", "yes", "no")) %>%
+  filter(!is.na(text_ind))
+
+sample_prop <- no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  calculate(stat = "prop") 
+
+# define the statistic
+obs_stat <- no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  hypothesize(null = "point", p = 0.06) %>%
+  calculate(stat = "z") 
+
+# define a null distribution
+null_dist <- no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  assume("z")
+```
+
+### Question 1
+
+<!---- Answer to Question 1 starts here ----->
+
+Write here your answer to question 1. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+the proportion is .07119 of high schoolers thaat text and drive.
+
+```{r question1}
+# Insert Code Here
+no_helmet %>% group_by(text_ind) %>% summarise(n())
+
+463/(463+6040)
+```
+
+
+
+<!---- Answer to Question 1 ends here ----->
+
+
+### Question 2
+
+<!---- Answer to Question 2 starts here ----->
+
+Write here your answer to question 2. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question2}
+# Insert Code Here
+no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  assume("z") %>%
+  get_confidence_interval(
+    level = 0.99,
+    point_estimate = sample_prop)
+
+
+
+```
+
+
+<!---- Answer to Question 2 ends here ----->
+
+
+### Question 3
+```{r n-for-me-plot}
+n <- 1000
+```
+
+The first step is to make a variable `p` that is a sequence from 0 to 1 with each number incremented by 0.01.
+You can then create a variable of the margin of error (`me`) associated with each of these values of `p` using the familiar approximate formula ($ME = 2 \times SE$).
+
+```{r p-me}
+p <- seq(from = 0, to = 1, by = 0.01)
+me <- 2 * sqrt(p * (1 - p)/n)
+```
+
+Lastly, you can plot the two variables against each other to reveal their relationship.
+To do so, we need to first put these variables in a data frame that you can call in the `ggplot` function.
+
+```{r me-plot}
+dd <- data.frame(p = p, me = me)
+ggplot(data = dd, aes(x = p, y = me)) + 
+  geom_line() +
+  labs(x = "Population Proportion", y = "Margin of Error")
+```
+
+<!---- Answer to Question 3 starts here ----->
+
+Write here your answer to question 3. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+The relationship between population proportion and margin of error is parabolic. The margin of error is maximized at population proportion = .5. and the margin of error decreases as the population proportion increase or decreases from that point of .5. This makes sense since lower population proportions will ahve smaller margins of errors since the population propotion is smaller. it makes sense that it is similar since there is smaller variability when the population proportion is closer to 0 or one and it maximizes around .5.
+
+```{r question3}
+# Insert Code Here
+data <- c(57, 66, 69, 71, 72, 73, 74, 77, 78, 78, 79, 79, 81, 81, 82, 83, 83, 88, 89, 94)
+
+# Create a boxplot
+boxplot(data, main = "Basic Boxplot", ylab = "Values")
+summary(data)
+
+
+```
+
+
+<!---- Answer to Question 3 ends here ----->
+
+
+
+
+### Question 4
+
+<!---- Answer to Question 4 starts here ----->
+How would your decision change if the significance level was .05?
+Since we are using a higher significance level, we would reject the null hypothesis since. since we rejected already at .01 it makes sense that we reject at .05 since it's even more easy to reject the null hypothesis at .05 than .01.
+
+Write here your answer to question 4. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question4}
+# Insert Code Here
+
+
+
+```
+
+
+<!---- Answer to Question 4 ends here ----->
+
+
+
+### Question 5
+
+<!---- Answer to Question 5 starts here -----> The P value we got from the below code is 2.19e^-15 which is smaller than necessary p value of .05 so there is enough evidence to say that more than 5% of high-schoolers text and drive. and reject the null hypothesis.
+
+Write here your answer to question 5. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question5}
+# Insert Code Here
+obs_stat <- no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  hypothesize(null = "point", p = 0.05) %>%
+  calculate(stat = "z") 
+
+# define a null distribution
+null_dist <- no_helmet %>%
+  specify(response = text_ind, success = "yes") %>%
+  assume("z")
+
+# calculate a p-value
+get_p_value(null_dist, obs_stat, direction = "greater")
+
+
+
+```
+
+
+<!---- Answer to Question 5 ends here ----->
+
+
+

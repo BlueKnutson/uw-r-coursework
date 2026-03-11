@@ -1,0 +1,103 @@
+---
+title: "Introduction to probability"
+output:
+  html_document:
+    css: style.css
+    df_print: paged
+  pdf_document: default
+---
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = FALSE, fig.show = "hide", message = FALSE)
+```
+
+In this lab, we will work on the concept of probability. We will "simulate" the act of tossing a coin several times. You could simulate this with a real coin but tossing it would take a long time, thus a "computer simulation" comes in handy in this context.
+
+# What are simulations in Statistics?
+
+Simulations are computational models or experiments designed to **mimic** real-world processes or systems. In the context of probability and statistics, simulations are used to model scenarios (more or less complex) that might be difficult to analyze analytically. 
+
+By running multiple trials of a simulated process, we can explore, for instance. the behavior of random variables, estimate probabilities, and study the effects of different conditions. Simulations are especially useful for understanding uncertainty, variability, and for testing hypotheses when it is impractical or impossible to conduct real-world experiments. 
+
+# Tossing a fair coin
+
+As a first step, we will create a "coin", i.e. we create an object in `R` that contains the two possible results of the experiment "a coin toss".
+
+```{r}
+coin <- c("H", "T")
+coin
+```
+
+`coin` is a vector (a specific type of data object) containing two values `H` and `T`. More specifically it is `character` vector (the quotations around the value H and T, suggest that this is not a number but rather a collection of characters!). You can verify that `coin` is a character vector by using the command `class`:
+
+```{r}
+class(coin)
+```
+
+We have simulated the coin, but not the actual toss. In order to simulate the actual toss, we randomly sample one value from the `coin` vector. We will use the `sample()` function and specify the probabilities associated with the two values.
+
+```{r}
+sample(coin, size = 1, prob=c(0.5,0.5))
+```
+
+What value did you get? Is it the same as the one in this file?
+
+
+:::: {.bluebox data-latex=""}
+::: {.center data-latex=""}
+**Sampling variability**
+:::
+The reason why you are getting difference answers is Sampling variability!
+
+Sampling variability refers to the natural fluctuations that occur when different samples are taken from the same population. Each sample will likely yield slightly different results due to random chance, even if they are all drawn from the same population (in this case the population is the coin!). 
+
+This variability is a key concept in probability and statistics because it helps us understand the uncertainty associated with making inferences about a population based on sample data.
+::::
+
+
+Let's now assume we toss the coin several times, for instance 1000 times and let's count how many times we obtained H:
+
+```{r}
+coin_tosses <- sample(coin, size = 1000, replace=T, prob=c(0.5,0.5))
+sum(coin_tosses=="H")
+```
+
+and the proportion of H in our sample:
+
+```{r}
+sum(coin_tosses=="H")/1000
+```
+
+The above value `r sum(coin_tosses=="H")/1000` is an estimate of the probability of obtaining Heads.
+
+More in particular, the frequentist definition of probability is that: an event's probability as the limit of its relative frequency in infinitely many independent trials.
+
+If we increase the number of trials to 10,000 or 100,000 or even 1,000,000, we will see that the proportion of heads will get closer to the value we assigned to it of 0.5:
+```{r}
+
+```
+
+```{r}
+coin_tosses <- sample(coin, size = 10000, replace=T, prob=c(0.5,0.5))
+sum(coin_tosses=="H")/10000
+coin_tosses <- sample(coin, size = 100000, replace=T, prob=c(0.5,0.5))
+sum(coin_tosses=="H")/100000
+coin_tosses <- sample(coin, size = 1000000, replace=T, prob=c(0.5,0.5))
+sum(coin_tosses=="H")/1000000
+```
+
+:::: {.bluebox data-latex=""}
+::: {.center data-latex=""}
+**Setting a simulation seed**
+:::
+Note: In order to make sure we all get the same result, we can use the `set.seed()` function and all set the same seed, for example `set.seed(123)`.
+
+Setting a seed will cause R to select the same sample each time you knit your document. This will make sure your results don't change each time you knit, and it will also ensure reproducibility of your work (by setting the same seed it will be possible to reproduce your results). 
+
+```{r}
+set.seed(123)
+```
+
+The number `123` is completely arbitrary. If you need inspiration, you can use your ID, birthday, or just a random string of numbers. The important thing is that you use each seed only once in a document. 
+::::
+

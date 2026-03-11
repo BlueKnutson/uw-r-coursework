@@ -1,0 +1,177 @@
+---
+title: "Final Project"
+author: "Blue"
+date: "2023-08-10"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+NEW DATA SET
+
+```{r}
+library(readr)
+#read in fire data
+fire_data <- read_csv('mapdataall.csv')
+
+View(mapdataall.csv)
+```
+
+```{r}
+library(tigris)
+library(ggplot2)
+
+school <- school_districts(state = "CA")
+counties <- counties(state = "CA")
+counties$sum_fire
+
+#testing out to make sure tigris is working
+
+
+ggplot()+
+  geom_sf(data = counties)
+
+```
+
+
+
+```{r}
+#creating a bunch of different geographical plots
+library(readr)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+library(magrittr)
+
+# Load the county boundaries for California
+counties <- counties(state = "CA")
+
+# Calculate the areas of all counties
+county_areas <- st_area(counties)
+
+# Convert the areas to acres
+acres <- county_areas / 4046.86
+
+# Create a new dataframe with county names and their corresponding areas
+county_areas_df <- data.frame(NAME = counties$NAME, Acres = acres)
+
+
+counties <- counties(state = "CA")
+fire_data <- read_csv("mapdataall.csv")
+
+fire_data_sf <- fire_data %>%
+  st_as_sf(coords = c("incident_longitude", "incident_latitude")) %>%
+  st_set_crs(4326) %>%
+  filter(incident_acres_burned >= 5000)
+
+ggplot() +
+  geom_sf(data = counties, fill = NA, color = "black") +
+  geom_sf(data = fire_data_sf, aes(color = incident_acres_burned), size = 2) +
+  scale_color_viridis_c(option = "magma", direction = -1) +
+  theme_minimal() +
+  labs(color = "Acres Burned") +
+  coord_sf(xlim = c(-125, -114), ylim = c(32, 43))  # california
+
+fire_data %<>%
+  st_as_sf(coords = c("incident_longitude", "incident_latitude")) 
+
+fire_data %<>%
+  st_set_crs(st_crs(counties))
+
+fire_data %<>%
+  filter(`incident_acres_burned` >= 5000)
+
+
+counties %<>%
+  st_join(fire_data)
+
+counties %<>%
+  group_by(GEOID)
+counties %<>%
+  summarise(sum_fire = sum(incident_acres_burned, na.rm = T))
+
+ggplot(counties)+
+  geom_sf(aes(fill = sum_fire))+
+  scale_fill_viridis_c(option = "magma", direction = -1)+
+  theme_minimal()+
+  labs(fill = "sum of acres burned")
+
+```
+
+```{r}
+library(readr)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+library(ggplot2)
+
+# Load the county boundaries for California
+
+counties <- counties(state = "CA")
+
+# Calculate the areas of all counties
+
+county_areas <- st_area(counties)
+acres <- county_areas / 4046.86
+county_areas_df <- data.frame(NAME = counties$NAME, Acres = acres)
+county_areas_df <- county_areas_df %>%
+  mutate(
+    Acres = as.numeric(gsub("\\D", "", Acres))
+  )
+fire_data <- read_csv("mapdataall.csv")
+
+fire_data_sf <- fire_data %>%
+  st_as_sf(coords = c("incident_longitude", "incident_latitude")) %>%
+  st_set_crs(4326) %>%
+  filter(incident_acres_burned >= 5000)#only fires that burned 5000+acres
+
+ggplot() +
+  geom_sf(data = counties, fill = NA, color = "black") +
+  geom_sf(data = fire_data_sf, aes(color = incident_acres_burned), size = 2) +
+ 
+  theme_minimal() +
+  labs(color = "Acres Burned") +
+  coord_sf(xlim = c(-125, -114), ylim = c(32, 43))  # california image
+
+fire_data %<>%
+  st_as_sf(coords = c("incident_longitude", "incident_latitude"))  #converts fire_data into a spatial data frame
+
+fire_data %<>%
+  st_set_crs(st_crs(counties)) #This sets the CRS of the fire_data to match the CRS of the counties spatial data.
+
+counties %<>%
+  st_join(fire_data) #matching the fire_data fires to their specific counties
+
+counties %<>%
+  left_join(county_areas_df, by = c("NAME" = "NAME"))
+
+counties %<>%
+  group_by(GEOID) %>%
+  summarise(sum_fire_ratio = sum(incident_acres_burned, na.rm = TRUE) / sum(Acres, na.rm = TRUE)) #calculating the proportion of acres burned to total acres in each county.
+
+#ggplot of the acres burned/acres in each county. With a linear scale.
+ggplot(counties) +
+  geom_sf(aes(fill = sum_fire_ratio)) +
+
+  theme_minimal() +
+  labs(fill = "Sum of Acres Burned / Total County Acres")  # Set the legend label
+
+
+ggplot(counties) +
+  geom_sf(aes(fill = sum_fire_ratio)) +
+  scale_fill_viridis_c(trans = "log10") +  # Apply a logarithmic color scale since it was not understandable with a linear scale (too polar)
+  theme_minimal() +
+  labs(fill = "Sum of Acres Burned / Total County Acres")  # Set the legend label
+
+  
+  
+
+```
+
+
+conext for the outlier: the Thomas fire in Ventura county was massive. It burned about 282,000 acres and took 6 months to put out compltetly. It was started by power lines and it as able to spread so effectively because of strong winds and because there was a lot of thick, dry brush in the area that was perfect wildfire fuel.
+
+backstory on some of the counties, chapter 6 scatter plot acres vs wter quality, change over time, compare counties to future counties.

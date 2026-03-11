@@ -1,0 +1,172 @@
+---
+title: "LAB 7 Submission sheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Modify this file only to add your answers. Please, do not delete any code from this file.
+
+```{r load-packages, echo=FALSE, message=FALSE, results = "hide"}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("openintro")) install.packages("openintro")
+if(!require("infer")) install.packages("infer")
+if(!require("skimr")) install.packages("skimr")
+library(tidyverse)
+library(openintro)
+library(infer)
+library(skimr)
+
+data(yrbss)
+
+yrbss <- yrbss %>% 
+  mutate(physical_3plus = if_else(physically_active_7d > 2, "yes", "no"))  %>%
+  na.exclude()
+
+t_obs <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  calculate(stat = "t", order = c("yes", "no"))
+
+t_dist <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  assume(distribution = "t")
+```
+
+### Question 1
+
+<!---- Answer to Question 1 starts here ----->
+
+Question 1: How many observations are we missing weights from?
+
+there are missing weights from 1004 observations
+
+Write here your answer to question 1. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question1}
+# Insert Code Here
+
+
+```
+
+
+
+<!---- Answer to Question 1 ends here ----->
+
+
+### Question 2
+
+<!---- Answer to Question 2 starts here ----->
+
+Question 2: Is there a relationship between these two variables? What did you expect and why?
+
+people that do excercise have a higher mean and median weight than people who do not excercise. The spread of the "No" boxplot distritribution is wider and has much more outliers. This relationship between weight and going to the gym makes sense because many highschoolers go to the gym to gain weight rather than adults who may usually go to lose weight. Therefore, it makes sense that highschoolers that go to the gym weigh more.
+
+Write here your answer to question 2. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question2}
+# Insert Code Here
+
+
+
+```
+
+
+<!---- Answer to Question 2 ends here ----->
+
+
+### Question 3
+
+<!---- Answer to Question 3 starts here ----->
+Question 3: Are all conditions necessary for inference satisfied? Comment on each.
+
+
+
+Write here your answer to question 3. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question3}
+# Insert Code Here
+ggplot(data = yrbss, mapping = aes(x= weight, fill = physical_3plus))+
+  geom_histogram()
+
+
+```
+1) independence: The weight of one person does not impact the weight of another person. This makes sense since the weight of one highschooler does not impact another's and make the heavier or lighter.
+
+2) Normality: The sample size of people in the no catagory is larger than 30 and the number of people in the yes catagory is larger than 30 so according to the CLT we can treat this distribution as normal.
+
+3) skew: while there is a slight right skew for both the yes and no catagories, it isn't that pronounced and n > 30 for both catagories so we can ignore it.
+
+Therefore, all conditions are met for inference
+
+
+<!---- Answer to Question 3 ends here ----->
+
+
+
+
+### Question 4
+
+<!---- Answer to Question 4 starts here ----->
+Question 4: Add a vertical red line to the plot above, demonstrating where the observed difference in means (t_obs) falls on the distribution.
+
+
+```{r question4}
+
+visualize(t_dist) +
+  shade_p_value(obs_stat = t_obs, direction = "two-sided")
+```
+
+
+<!---- Answer to Question 4 ends here ----->
+
+
+
+### Question 5
+
+<!---- Answer to Question 5 starts here ----->
+
+Question 5: Based, on the results in the two plots above, what is conclusion?
+
+based on the results we can reject the null hypothesis that the average weight of highschoolers that go to the gym at least three times a week is the same as the average weight of highschoolers that don't go to the gym 3 times a week since the p value is extremely small. This means that we can confidently say there is a difference in average weight for highschoolers that do and don't exercise at least three times a week. since the p values is less than .05 we can reject the null hypothesis.
+
+Write here your answer to question 5. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question5}
+# Insert Code Here
+
+
+
+```
+
+
+<!---- Answer to Question 5 ends here ----->
+
+
+### Question 6
+
+<!---- Answer to Question 6 starts here ----->
+
+Question 6: Repeat the above tests and analysis with alternative hypothesis that whose who are physically active for at least 3 days a week are heavier than those who are not physically active.
+
+the P value of this hypothesis test is 0.0001030598	which is less than .05 so we can reject the null hypothesis that highschoolers that go to the gym at least three days a week weigh less than or the same as highschoolers that do not go to the gym. Then, we can confidenly say highschoolers that are physically active for at least 3 days a week are heaveier than those who are not physically active.
+
+Write here your answer to question 6. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question6}
+# Insert Code Here
+
+
+get_p_value(t_dist, t_obs, "right")
+
+
+visualize(t_dist) +
+  shade_p_value(obs_stat = t_obs, direction = "right")
+
+```
+
+
+<!---- Answer to Question 6 ends here ----->
+
+
+

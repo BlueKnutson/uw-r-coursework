@@ -1,0 +1,203 @@
+---
+title: "LAB 5 Submission sheet"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+Modify this file only to add your answers. Please, do not delete any code from this file.
+
+```{r load-packages, message=FALSE}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("openintro")) install.packages("openintro")
+if(!require("infer")) install.packages("infer")
+library(tidyverse)
+library(openintro)
+library(infer)
+set.seed(1234)
+```
+
+
+```{r}
+global_monitor <- tibble(
+  scientist_work = c(rep("Benefits", 80000), rep("Doesn't benefit", 20000))
+)
+```
+
+
+```{r samp1}
+samp1 <- global_monitor %>%
+  sample_n(50)
+```
+
+
+### Question 1
+
+<!---- Answer to Question 1 starts here -----> 13 people of 50 believe the work scientists do does not benefit them. This is a higher proportion of people not believing that scientist's work benefits them than the population. the population rate of not believing is about 20% and this sample is 26%. I would not expect
+
+Write here your answer to question 1. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question1}
+# Insert Code Here
+
+
+
+```
+
+
+
+<!---- Answer to Question 1 ends here ----->
+
+
+### Question 2
+
+<!---- Answer to Question 2 starts here -----> 
+
+Write here your answer to question 2. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+I would not expect the sample proportion to match another student's sample since the outcome is random. I could expect them to be similar numbers but I could not be sure since the sampling is random out of the population data.
+
+```{r question2}
+# Insert Code Here
+set.seed(1233)
+samp2 <- global_monitor %>%
+  sample_n(50)
+samp2 %>%
+  count(scientist_work) %>%
+  mutate(p_hat = n /sum(n))
+
+```
+as expected, samp2 differs from samp 1 and has 11/50 people that don't believe sientist's work benefits them. samp 2 has a proportion of 11/50 and samp2 has a proportion of 13/50. those numbers are pretty close together but still different due to randomness.
+
+<!---- Answer to Question 2 ends here ----->
+
+
+```{r iterate}
+sample_props50 <- global_monitor %>%
+                    rep_sample_n(size = 50, reps = 15000, replace = TRUE) %>%
+                    count(scientist_work) %>%
+                    mutate(p_hat = n /sum(n)) %>%
+                    filter(scientist_work == "Doesn't benefit")
+```
+
+
+
+### Question 3
+
+<!---- Answer to Question 3 starts here ----->
+
+Write here your answer to question 3. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+There are 15,000 elements in sample_props50. the sampling distribution is a normal distribution and has an average mean of about 0.1991813. this mean makes sense since the original data had 20% of the population reportng they didn't believe scientist's work benefited them. The two means are incredibly close. In this histogram Phat represents the mean of a random sample from the population.
+
+```{r question3}
+ggplot(data = sample_props50, aes(x = p_hat)) +
+  geom_histogram(binwidth = 0.02) +
+  labs(
+    x = "p_hat (Doesn't benefit)",
+    title = "Sampling distribution of p_hat",
+    subtitle = "Sample size = 50, Number of samples = 15000"
+  )
+
+mean(sample_props50$p_hat)
+
+```
+
+
+<!---- Answer to Question 3 ends here ----->
+
+
+
+
+### Question 4
+
+<!---- Answer to Question 4 starts here ----->
+
+Write here your answer to question 4. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+the expected value and standard deviation are 0.1991813 and 0.05692825. this means that the expected value is 0.1991813 and we can expect about 68% of the data to be between 0.1991813-0.05692825 and 0.1991813 + 0.05692825.
+
+```{r question4}
+mean(sample_props50$p_hat)
+sd(sample_props50$p_hat)
+
+sample_props50 %>% group_by(scientist_work) %>% summarise(mean_prop = mean(p_hat, na.rm =TRUE), sd_prop = sd(p_hat, na.rm = TRUE))
+
+
+```
+
+
+<!---- Answer to Question 4 ends here ----->
+
+
+
+### Question 5
+
+<!---- Answer to Question 5 starts here ----->
+
+Write here your answer to question 5. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+There are 25 observations in this this object and each element represents 10 people from the populaiton and how many of them don't believe they benefit from scientists work and what proportion of the sample proportion that ends up being. since the sample sizes are smaller the standard deviation of p_hat is greater.
+
+```{r question5}
+set.seed(1233)
+# Insert Code Here
+sample_probs_small <- global_monitor %>%
+                    rep_sample_n(size = 10, reps = 25, replace = TRUE) %>%
+                    count(scientist_work) %>%
+                    mutate(p_hat = n /sum(n)) %>%
+                    filter(scientist_work == "Doesn't benefit")
+
+sample_probs_small
+sd(sample_probs_small$p_hat)
+```
+
+
+<!---- Answer to Question 5 ends here ----->
+
+
+
+
+### Question 6
+
+<!---- Answer to Question 6 starts here ----->
+Write here your answer to question 6. No code needed.
+
+Each observation in the sampling distribution represents the mean proportion of people that don't believe scientist's work benefits them.
+the mean remains pretty constant across all distributions at about .2
+the Standard deviation decreases as the the sample size increases because higher sample sizes will get closer to the mean on average, so when comparing the means they will be closer together so the standard deviation is lower.
+at each increase in sample size the distribution appears to be more tightly packed as the sample size goes up since the elements are more consistently closer to the mean and the data isn't as spread out. the distribution with a sample size of 10 also seems to be right skewed while the other two follow the normal distribution.
+
+```{r}
+sample_size <- 10
+sample_propsn <- global_monitor %>%
+rep_sample_n(size = sample_size, reps = 5000, replace = TRUE) %>% count(scientist_work) %>% mutate(p_hat = n /sum(n)) %>%
+filter(scientist_work == "Doesn't benefit")
+
+ggplot(data = sample_propsn, aes(x = p_hat)) +
+  geom_histogram(binwidth = 0.1)
+sd(sample_propsn$p_hat)
+
+sample_size <- 50
+sample_propsn <- global_monitor %>%
+rep_sample_n(size = sample_size, reps = 5000, replace = TRUE) %>% count(scientist_work) %>% mutate(p_hat = n /sum(n)) %>%
+filter(scientist_work == "Doesn't benefit")
+
+ggplot(data = sample_propsn, aes(x = p_hat)) +
+  geom_histogram(binwidth = 0.05)
+sd(sample_propsn$p_hat)
+
+sample_size <- 100
+sample_propsn <- global_monitor %>%
+rep_sample_n(size = sample_size, reps = 5000, replace = TRUE) %>% count(scientist_work) %>% mutate(p_hat = n /sum(n)) %>%
+filter(scientist_work == "Doesn't benefit")
+
+ggplot(data = sample_propsn, aes(x = p_hat)) +
+  geom_histogram(binwidth = 0.01)
+sd(sample_propsn$p_hat)
+
+
+
+```
+
+<!---- Answer to Question 6 ends here ----->

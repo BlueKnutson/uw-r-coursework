@@ -1,0 +1,182 @@
+---
+title: "Problem set 7"
+author: "Blue"
+date: "2023-08-08"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1) Download the “class_activities.csv” file from Canvas. Using igraph, create a network diagram based on who has worked with who in our class activities this quarter (you may want to use graph_from_data_frame()). Then plot the network.
+
+```{r}
+library(readr)
+library(igraph)
+
+library(dplyr)
+
+class_activities <- read_csv("class_activities.csv")
+
+net <- graph_from_data_frame(class_activities, directed = FALSE)
+
+plot(net, 
+    
+     vertex.color = "lavender", 
+     vertex.frame.color = NA, 
+     vertex.label.cex = .5, 
+     edge.curved = 0, 
+     edge.width = .1, 
+     edge.color = "gray1")
+
+
+
+```
+
+2) Choose a centrality measure, and explain how you would interpret this in the context of the class activities data. Who is/are the most central actor(s) according to this measure?
+```{r}
+degree(net)
+```
+I am choosing the degree centrality for my centrality measure. In this context, it will look for the person that sat with the most unique people (or the most edges). Sitting with one person for 4 of the weeks will count as one connection but sitting with 4 different people over 4 weeks will count as 4 connections. The most central actor is Qingyuan with 16 edges (connections to unique people).
+
+
+3) Using the IPCC co-authorship data, create a network graph of all co-authors who share at least 2 publications together, excluding those with no network ties, similar to what we do in section 7.5. Graph the data using betweenness scores, rather than eigenvector scores, to plot the vertex sizes. Does this make a difference in our interpretation of the network? (Try comparing the top 5 most central authors, using betweenness and eigenvector centralities).
+
+```{r}
+library(readr)
+ipcc_authors <- read_csv("IPCC_co_authorship.csv", skip = 1)
+library(dplyr)
+library(magrittr)
+
+# reorder column names to match rows
+ipcc_authors %<>%
+  select(order(colnames(.)))
+
+
+# turn dataframe into matrix
+ipcc_authors %<>%
+  select(-Author) %>%
+  as.matrix()
+
+ipcc_net <- graph_from_adjacency_matrix(ipcc_authors,
+                                        mode = "undirected")
+
+# replace 1s with 0s
+ipcc_authors[ipcc_authors == 1] = 0
+
+# replace NAs with 0s
+ipcc_authors[is.na(ipcc_authors)] = 0
+
+# vector of authors who do not collaborate with others
+no_colab <- which(apply(ipcc_authors, 1, sum, na.rm = TRUE) == 0)
+
+
+
+ipcc_authors <- ipcc_authors[-no_colab,
+                             -no_colab]
+ipcc_net <- graph_from_adjacency_matrix(ipcc_authors,
+                                        mode = "undirected")
+
+
+V(ipcc_net)$betweenness <- betweenness(ipcc_net)
+
+
+plot(ipcc_net, 
+     vertex.size = V(ipcc_net)$betweenness/max(V(ipcc_net)$betweenness) * 20, 
+     vertex.color = "lavender", 
+     vertex.frame.color = NA, 
+     vertex.label.cex = .5, 
+     edge.curved = .05, 
+     edge.width = .1, 
+     edge.color = "gray1")
+degree(ipcc_net)
+betweenness(ipcc_net)
+
+```
+
+```{r}
+library(tidyr)
+library(ggplot2)
+# create dataframe with similarity scores
+central_df <- data.frame( eigenvector= evcent(ipcc_net)$vector,
+                         betweenness = betweenness(ipcc_net)
+                        )
+ipccDfEig <- data.frame(evcent(ipcc_net)$vector)
+ipccDfBet <- data.frame(betweenness(ipcc_net))
+ipccDfDeg <- data.frame(degree(ipcc_net))
+ipccDfClose <- data.frame(closeness(ipcc_net))
+
+
+sorted_dataEig <- ipccDfEig[order(ipccDfEig$evcent.ipcc_net..vector), ]
+sorted_dataBet <- ipccDfBet[order(ipccDfBet$betweenness.ipcc_net.), ]
+
+sorted_dataClose <- ipccDfClose[order(ipccDfClose$closeness.ipcc_net.), ]
+
+tail(sorted_dataEig, 5)
+tail(sorted_dataBet, 5)
+tail(sorted_dataClose, 5)
+```
+eigenvector:Nakicenovic, Riahi, Gruebler, Van-Vuuren, Rogner.
+Betweeness: Nakicenovic, Smith, Shukla, Price, Edenhofer.
+
+Degree: Nakicenovic, Riahi, Bosetti, Carraro, Van-Vuuren.(done on accident)
+
+changing how you define the center of the neural system absolutely changes how you interpret it. While there are some authors that score highly (Nakicenovic) no matter what measure you use, all the other rankings changed. explain how I got this answer
+
+In order to get the rankings of these authors I ordered all of their scores then manually went into the corrosponding ippc dataframs and found whitch author connected with the specific score.
+
+
+4) Let’s say you want to give one of the IPCC authors a memo to disseminate to the others. Who would you choose? Which measure of centrality would help you arrive at your answer?
+
+If the goal is to spread it to 100% of all possible targets as fast as possible the best measure to use would be closeness centrality Since that is on average the closest for ALL other nodes. This would have Yamaguchi, Sterner, Ramaswami, Mueller, Gollier, Dutt, Dhakal, and Allwood as the best authors to give a memo. However, this measure is not perfect since it optimizes the average instead of the max edges away. The best measure would be to use the author that has the lowest max distance from the farthest person since 100% of people would be informed by that point in communication.
+If there were a chance that an author receiving the memo woudln't pass it on (but the first had 100%), the best person to give the memo would be a between person or a eigenvector author. The between person could make sure that no branch of authors would be severed, however the eigenvector person could almost ensure that the message will be spread to a good amount of people. The between person would be a gamble with higher risk and reward while the eigenvector person would be a lower risk, stable reward option.
+
+5)Finally, plot the IPCC co-authorship data, but change the color/shape of the vertices so that these correspond to authors’ gender. Describe what you see.
+
+```{r}
+ipcc_cvs <- read_csv("IPCC_cv.csv")
+
+ipcc_cvs %<>%
+  slice(-no_colab)
+
+ipcc_cvs %<>%
+  mutate(region = case_match(Gender,
+                             # female pink
+                             0 ~ "pink", 
+                             # male blue
+                            1 ~ "blue",
+                             ))
+V(ipcc_net)$Gender <- ipcc_cvs$Gender
+gender_colors <- c("pink", "blue")
+plot(ipcc_net, 
+   edge.width=(E(ipcc_net)$weight)/5,
+    vertex.size = V(ipcc_net)$betweenness/max(V(ipcc_net)$betweenness) * 20, 
+
+  vertex.color = gender_colors[V(ipcc_net)$Gender + 1],
+     vertex.alpha = 0.5,
+     vertex.frame.color = NA, 
+     vertex.label.cex = .1, #changed so that you can see the male vs female bubbles more easily
+    vertex.label.color = "black",
+     edge.curved = .05, 
+     edge.width = .1, 
+     edge.color = "gray1")
+
+
+legend(
+  "bottomright",
+  legend = c("Female", "Male"),
+  pt.bg  = c("pink", "blue"),
+  pch    = 21,
+  cex    = 1,
+  title  = "Gender"
+  )
+
+
+```
+
+The central authors are almost all male although there are a few pockets of female authors collaberating. If you look at the closed systems they are usually mono-gendered with most of the systems being male. Either male authors greatly outnumber female authors, the data set is not representitave of the author population, or female authors don't collaborate as much for some reason. 
+
+

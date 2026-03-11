@@ -1,0 +1,177 @@
+---
+title: "HW 6 394"
+---
+title: "Homework 6"
+subtitle: "Winter 2025"
+author: "WRITE YOUR NAME HERE"
+date: "`r Sys.Date()`"
+output: pdf_document
+header-includes:
+    - \usepackage{amsmath, amssymb}
+    - \usepackage{setspace} 
+---
+
+\onehalfspacing
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE,
+                      warning = FALSE)
+library(tidyverse)
+
+```
+
+
+* * * 
+
+### Instructions
+
+- This homework is due in Gradescope on Wednesday March 5 by midnight PST. There is a 15 minute grace period and submissions made during this time will not be marked as late. Any work submitted past this period is considered late.  
+
+- Please answer the following questions in the order in which they are posed. 
+
+- Don't forget to (i) make a local copy this document for your work and to (ii) knit the document frequently to make sure there are no compilation errors. 
+
+- When you are done, download the PDF file as instructed in section and submit it in Gradescope. 
+
+* * *
+
+
+### Exercises 
+
+
+1. (Flooding river) A river floods every year. Suppose that the low-water mark is set at 1 and the high-water mark $X$ has CDF
+\begin{align*}
+	F_X(x) &= P(X \leq x) \\
+	       &= \left\{ \begin{array}{cc} 
+		               0 & x < 1 \\
+		               1 - 1/x^2 & 1 \leq x < \infty. \end{array} \right.
+\end{align*}
+
+a.  Find a PDF, $f(x)$ for $X$.
+
+$$d/dx(1-1/x^2)$$
+PDF is $$2/x^3$$
+
+b. If the low-water mark is set to 0 and we use a unit of measurement that is $\frac{1}{10}$ of that given previously, the high-water mark becomes $Y=10\:(X-1).$ Find $P(Y \leq 1)$. 
+   
+   $$P(10(x-1) ≤ 1/10)$$
+$$P(x-1 ≤ 1/10)$$
+$$P(x≤11/10)$$
+
+$$F(11/10) = 1-1/(11/10)^2 = 21/121 = P (Y ≤ 1)$$
+    
+
+2. (Phone calls) Suppose the duration of a phone call (in minutes), $X$, can be described probabilistically by the equation
+
+	 $$P(X > x) = \frac{1}{2} e^{-x} + \frac{1}{2} e^{- \frac{x}{5}}, \ 0 \leq x < \infty$$
+	   
+   	
+a. Write the CDF of $X$ by filling in the question marks in align environment below. (No explanation needed)
+
+   \begin{align*}
+   F(x) &= P(X \leq x) \\
+   &= \left\{ \begin{array}{cc} 
+                   0 & x < 0\\
+                   1-((1/2)e^{-x} +(1/2)e^{-x/5})\geq 0.
+              \end{array} \right.
+    \end{align*}
+    
+b. Find a PDF, $f(x)$  for $x$. Show your work mathematically. 
+$$d/dx ( 1-((1/2)e^{-x} +(1/2)e^{-x/5})) = (1/2)e^{-x} +(1/5)(1/2)e^{-x/5}) = (1/2)e^{-x} +(1/10)e^{-x/5})$$
+   \begin{align*}
+   F(x) &= P(X \leq x) \\
+   &= \left\{ \begin{array}{cc} 
+                   0 & x < 0\\
+                   (1/2)e^{-x} +(1/10)e^{-x/5})& x \geq 0.
+              \end{array} \right.
+    \end{align*}
+
+
+c. Find the probability that the call will last between 3 and 5 minutes. In other words, find $P(3 \leq X < 5)$. Show what you will be calculating first and then do the calculation in a code chunk and print the answer.
+    $P(3 \leq X < 5) = F(5) - F(3) $ 
+    $$ 1-((1/2)e^{-5} +(1/2)e^{-5/5}) -  (1-((1/2)e^{-3} +(1/2)e^{-x/3}))$$
+    ```{r}
+  cdf <- function(x) {
+    1 - (1/2) * exp(-x) - (1/2) * exp(-x/5)
+  }
+
+prob <- cdf(5) - cdf(3)
+
+print(prob)
+    
+    ```
+   
+   
+d. Find the median length of a phone call (in mins). Show what you are calculating mathematically first. Calculations should then be done in a code chunk and the answer reported.
+
+$$.5 = (1/2)e^{-x} +(1/10)e^{-x/5})$$
+```{r}
+median_eq <- function(q) {
+  cdf(q) - 0.5
+}
+
+median_q <- uniroot(median_eq, c(0, 10))$root
+
+print(median_q)
+
+``` 
+The median is 1.405998
+
+3. (Quadratic roots) Suppose $Y \sim Unif(-3,3)$. 
+
+a. Write the PDF of $Y$. (Don't forget the range)
+
+$$ f(x) = \frac{1}{6}  \quad -3 \leq x \leq 3$$
+
+b. Find the probability that the roots of the quadratic equation in $x$
+$$x^2 + x \cdot Y + (Y + 1)$$ are real. 
+
+    Hint: The roots of the equation $ax^2 + b x + c=0$ are real if the discriminant $b^2-4ac \geq 0$.
+    
+$$a = 1, b = Y, c = Y+1$$
+$$Y^2 - 4(1)(Y+1) >=0$$
+$$Y^2 -4Y -4 >= 0$$
+$$\frac{-(-4) \pm \sqrt{(-4)^2 - 4(1)(-4)}}{2(1)} = 2 \pm 2\sqrt2$$
+$$Y \leq 2 - 2\sqrt{2} \quad \text{corresponds to} \quad [-3, 2 - 2\sqrt{2}]$$
+$$Y \geq 2 + 2\sqrt{2} \quad \text{corresponds to} \quad [2 + 2\sqrt{2}, 3]$$
+$$3-(2 + 2\sqrt{2}) + (2 - 2\sqrt{2} -(-3) =  \frac{6-4\sqrt{2}}{6} = 1-\frac{2\sqrt{2}}{3}$$
+$$1-\frac{2\sqrt{2}}{3}$$ is the probability of real roots.
+
+4. (P-values) The following ordered set of 27 Probability-values (from Kaati et al., Eur. J. Hum Genetics 2007) were the result of testing a hypothesis using many independent subgroups of a sample. If the hypothesis being tested is true, then the P-values all come from a uniform distribution on $[0,1)$.
+
+    ```{r pvalues}
+    pvalue_df <- tibble( 
+      pval = c(0.01, 0.01, 0.02, 0.04, 0.04, 0.05, 0.07, 0.07, 
+               0.10, 0.19, 0.24, 0.27, 0.34, 0.37, 0.44, 0.50, 
+               0.53, 0.54, 0.55, 0.61, 0.70, 0.77, 0.80, 0.80, 
+               0.82, 0.94, 0.99)
+      )
+    ```
+
+      Using `ggplot`, make a histogram of the P-values. The superimpose the PDF of a $Unif(0,1)$ on it. What do you conclude about the hypothesis being tested?
+
+     Hint: Please see problem 4 from the week 7 Quiz Section recording (Problem set 7) for sample code. Also when using the `breaks` argument, set the witdth of the bins to 1/6 for uniformity of grading.
+
+```{r}
+library(ggplot2)
+
+ggplot()+
+  geom_histogram(data = pvalue_df,
+                 mapping = aes (x = pval,
+                                y =after_stat(density)),
+                 breaks = seq(0,1,1/6),
+                 alpha = .5,
+                 color = "purple",
+                 fill = "gold")+
+  geom_function(fun = dunif, args = list(min = 0, max = 1))+
+    labs(x = "Pval",
+        title = "Density Histogram with unirform PDF" )
+                   
+                        
+
+
+```
+Since there are a lot of small P values in the first ben reaching twice as high as the uniform distribution line om not confident that this data follows the unirform disttibution, however, the rest of the data does follow the uniform distribution pretty well until the very end where it drops off significantly. I'd say there isn't enough evidence to say the hyopthesis being tested is true since this data doesn't exactly seem uniform. If there were more samples it would be easier to tell. Since the p values are clustered in the lower first bin, this is evidence to reject the null hyopthesis.
+
+

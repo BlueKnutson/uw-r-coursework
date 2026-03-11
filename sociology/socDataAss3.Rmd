@@ -1,0 +1,135 @@
+---
+title: "SocData3Ass"
+author: "Blue"
+date: "2023-07-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+Using the guardian_katrina.csv dataset (from Canvas Files), create a graph that compares word frequencies for different types of news stories (for example, World news vs. U.S. news). Motivate your comparison with some intuition or evidence, and tell us why this comparison is interesting. If you have more than two categories, try using the facet_wrap() command to display all the different graphs (an example of this can be found in the Text Mining with R book).Explain what you see in your visualization(s) and results.
+
+```{r 1}
+library(readr)
+#install.packages("pdftools")
+library(pdftools)
+library(tidytext)
+library(ggplot2)
+library(dplyr)
+katrinaData <- read_csv("guardian_katrina.csv")
+
+tidy_hearing <- katrinaData %>%
+  unnest_tokens(word, body_text) %>%
+  anti_join(stop_words)
+
+tidy_hearing_counts <- tidy_hearing %>%
+  count(section_name,word, sort = TRUE)
+head(tidy_hearing_counts, 10)
+
+tidy_hearing_counts <- head(tidy_hearing_counts, 10)
+
+
+
+ggplot(tidy_hearing_counts, aes(n, word))+
+  facet_wrap(vars(section_name))+
+  geom_col()
+
+
+```
+we can see that only the business is concerned with "prices" and "oil" which is understandable since that is the focus of the journal, how events will effect business. US news is talking about bush which makes sence since he was the president at the time and this was a national crisis. World news was more concerned with the actual event so it had more words like "Katrina", "Orleans", "hurricane", "people", "city"
+
+Create an account on ProQuest DTM, and create a visualization for news related to Hurricane Katrina. Explain what news sources you included and why. Produce the three types of visuals, and say a little bit about what each might mean (or whether there is any significance to these). Note: you can take a screenshot of these and include the image in your markdown with the following code:
+```{r 2}
+knitr::include_graphics("katrina.JPG")
+knitr::include_graphics("katrina2.JPG")
+
+```
+1) These topics are automatically seperated by the TDM and let's you know what the articles tend to be more interested in. It seems like there is a political section, a city section, a news section, and a news channels section.
+2) the geographical visualization didn't work, a possible reason for this is that I only used one publisher and they may not report where their article comes from.
+3) the sentiment visualization didn't work at all. Not sure why.
+
+
+Now, try creating a dataset in the workbench. See section 3.3 for instructions on saving the dataset as a .csv file and beginning to work with it in ProQuest’s Jupyter Notebooks. Create some simple frequencies of dates or news sources, and try to export these as a csv file. (Remember that you will not be able to export the full text). Then load the csv into your local R and create a graph using ggplot2. BONUS: If you are feeling ambitious, you can try installing the tidytext package in ProQuest TDM Studio, and exporting some word frequencies or other summary statistics. Just FYI, installing tidytext in ProQuest requires some additional effort. For instructions, see Getting Started -> 2022.05.25 -> ProQuest TDM Studio Manuals -> TDM_Studio_Manual.ipynb.
+
+```{r 3}
+#Jupyter was down during class.
+
+
+
+```
+
+Download at least two of the files from the “Katrina Hearings” folder in Canvas (within the Data folder), or choose your own congressional hearings here and download PDFs. Convert the documents to tidytext style using the unnest_tokens() function, and remove stop words. Show the first few rows of each dataset using the head() function.
+
+```{r 4}
+library(pdftools)
+# read hearing into R
+levees_hearing <- pdf_text("katrina_hearing_levees.pdf") %>%
+  as.data.frame()
+military_hearing <- pdf_text("katrina_hearing_military.pdf") %>%
+  as.data.frame()
+colnames(levees_hearing) <- c("text")
+colnames(military_hearing) <- c("text")
+
+tidy_levees <- levees_hearing %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) 
+
+
+tidy_military <- military_hearing %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words) 
+
+head(tidy_levees, 10)
+head(tidy_military, 10)
+
+
+
+```
+
+
+Compare the frequencies of words between the two hearings. First, use the count() function to generate counts of words in each document, and compare the two using tables or a plot. Then, read portions of each document in more detail to explain some of the trends that you see. Are you able to say something meaningful about the congressional discourse? Why or why not?
+
+```{r 5}
+
+
+library(readr)
+library(pdftools)
+library(tidytext)
+library(ggplot2)
+library(dplyr)
+
+
+
+tidy_leveesDone <- tidy_levees %>%
+  count(word, sort = TRUE)%>%
+  mutate( type = 'levees')%>%
+  head(10)
+
+tidy_militaryDone <- tidy_military %>%
+  count(word, sort = TRUE)%>%
+  mutate( type = 'miliraty')%>%
+ head(10)
+  
+
+df <- bind_rows(tidy_militaryDone, tidy_leveesDone)
+
+
+ggplot(df, aes(x = n,y= word))+
+  geom_col(aes(fill = type), position = "jitter")
+  
+
+
+  
+
+
+```
+Then, read portions of each document in more detail to explain some of the trends that you see. Are you able to say something meaningful about the congressional discourse? Why or why not?
+
+yes you can see somehting meaningful, some of the top words in the military document are "defence", "guard", and "prepared". This shows that the military sees the hurricane as almost an invader that needs to be fended off. This could effect how the military will make decisions about the hurricane responce. Some of the top words in the levees document are "engineers", "time", and "canal". You could enterpret this as the levee document being more concerned with the logistics of the hurricane and how best to minimize it's carnage through engineering and diverting the water.
+
+
+
+

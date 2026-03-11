@@ -1,0 +1,35 @@
+---
+title: "INFO 201 Data Assignment 0: My First Quarto"
+author: "Blue Knutson"
+format: 
+  html:
+    theme: cyborg
+    embed-resources: true
+---
+
+## Exercise 1
+
+In the following code chunk, create a vector that is called temps_in_f and includes the following values: 82, 87, 72, 78 This vector represents four daily temperatures in Fahrenheit.
+
+```{r}
+temps_in_f <- c(82, 87, 72 , 78)
+```
+
+## Exercise 2
+
+In the following code chunk, use the temps_in_f vector and math operations to come up with the Celsius equivalent of the Fahrenheit temperatures above. Note that the math to convert F to C is to first subtract 32 from the Fahrenheit temperature and then multiply by 5 and then divide by 9. When writing out this math in R, note that the typical order of operations used in math still work: put parentheses around the things you want to do first. It should looks similar to how you would use a calculator. 
+
+```{r}
+#The triple backticks with {r} tell Quarto that everything inside should be treated as R code
+(temps_in_f-32)*5/9
+```
+
+## Exercise 3
+
+In Quarto, you can create text that will be rendered with special formatting using extra formatting marks that only show up once you turn the document into html or other formats. For instance, asterisks around text will make text appear italicized once rended. *This text looks italic*. To get a sense of how you can format text, check out https://quarto.org/docs/authoring/markdown-basics.html and edit the following text so that it will have a line going through it (a strikethrough) when rendered:
+
+~~This text should be stricken from the record~~.
+
+## That's all!
+
+Once you've done the steps above, render this document, find the html file and upload it to Canvas!

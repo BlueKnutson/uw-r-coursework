@@ -1,0 +1,70 @@
+---
+title: "7/18/23 SOC"
+author: "Blue"
+date: "2023-07-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(tidytext)
+library(dplyr)
+library(magrittr)
+df<- data.frame(article = "Soc 128d",
+                text = c("In this class, we learn about text mining",
+                "Text minning is a great way",
+                "Text mining is fun!"))
+tidy_df<- df%>%
+  unnest_tokens(word,text)
+
+tidy_df %<>%
+  anti_join(stop_words)
+      
+#load("climate_comments.RData")
+#install.packages("RedditExtractoR")
+library(RedditExtractoR)
+      #   climate_subreddits<-find_subreddits("climate change")
+         
+         
+         #climate_urls<-find_thread_urls(subreddit = "climate change", period = "all")
+         
+         #get reddit content
+         climate_comments1 <- get_thread_content(climate_urls$url)
+         new_url <- find_thread_urls(subreddit = "cat")
+         tidy_comments<- climate_comments1$comments %>%
+           as.data.frame() %>%
+           unnest_tokens (word, comment) %>%
+           anti_join(stop_words)
+```
+```{r sentiment}
+#install.packages("textdata")
+library(textdata)
+library(tidytext)
+library(dplyr)
+library(magrittr)
+get_sentiments("nrc")
+
+
+tidy_comments %<>%
+  inner_join(get_sentiments("nrc"))
+tidy_comments %>%
+  select(word, sentiment)
+
+table(tidy_comments$)
+
+ggplot(tidy_comments, aes(y-sentiment))+
+  geom_bar(aes(fill = sentiment))+
+  theme_minimal()+
+  labs(title = "sentiment")
+
+```
+

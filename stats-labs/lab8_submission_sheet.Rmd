@@ -1,0 +1,133 @@
+---
+title: "LAB 8 Submission sheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Modify this file only to add your answers. Please, do not delete any code from this file.
+
+```{r load-packages, echo=FALSE, message=FALSE, results = "hide"}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("openintro")) install.packages("openintro")
+if(!require("statsr")) install.packages("statsr")
+if(!require("broom")) install.packages("broom")
+library(tidyverse)
+library(openintro)
+library(statsr)
+library(broom)
+
+hfi_2016 <- hfi %>% 
+  filter(year == 2016)
+m1 <- lm(pf_score ~ pf_expression_control, data = hfi_2016)
+m1_aug <- augment(m1)
+```
+
+### Question 1
+
+<!---- Answer to Question 1 starts here ----->
+
+Write here your answer to question 1. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+
+
+```{r question1}
+# Insert Code Here
+
+
+
+```
+
+Yes this relationship does look linear. there is a lot of variance within the data but it looks like it is a positive linear relationship. it does seem to vary more around the lower left points then hone in around the upper right corner but it's hard to tell.
+
+<!---- Answer to Question 1 ends here ----->
+
+
+### Question 2
+
+<!---- Answer to Question 2 starts here ----->
+
+
+
+Write here your answer to question 2. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question2}
+# Insert Code Here
+
+
+
+```
+I would expect the slope to be positive since the correlation coeeficient is poitive. I expect the intercept is at about 4.5 since if i were to draw a line through the middle of the points it would intecect the y axis about there.
+
+<!---- Answer to Question 2 ends here ----->
+
+
+### Question 3
+
+<!---- Answer to Question 3 starts here ----->
+
+Write here your answer to question 3. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+use tidy(m1)interpret the value of the slope
+
+```{r question3}
+# Insert Code Here
+
+tidy(m1)
+
+```
+The slope is .5418452 and the y intercept is 4.2838153 which means we can estimate the personal freedom score with the equation
+(Personal freedome score) = .5418452*(pf_expression_control)+4.2838153. in this case it means that a countries mean personal freedom increases about half as fast as the pf_expression_control variable. If the pf_expression_control increaed by 2 units we could expect the personal freedome score to increase by .5418452(2).
+
+For every 1 unit increase in `pf_expression_control`, we expect a country's mean personal freedom score to increase 0.542 units.
+
+<!---- Answer to Question 3 ends here ----->
+
+
+
+
+### Question 4
+if someone saw the least squares regression line and not the actual data how would they predict a countries personal freedom score for one with a 3 rating for "pf_expression_control"
+<!---- Answer to Question 4 starts here ----->
+
+
+
+Write here your answer to question 4. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question4}
+# Insert Code Here
+
+
+
+```
+
+
+They would predict that it's about 6 since that is the pf_score for the pf_expression_control = 3 if plugged into the linear equation. The exact prediciton (with the formula) would be (Personal freedom score) = .5418452*(6)+4.2838153. = 5.9093509
+<!---- Answer to Question 4 ends here ----->
+
+
+
+### Question 5
+
+<!---- Answer to Question 5 starts here ----->
+to the assumptions of linearity nearly mnormal residuals and constant variability hold?
+
+Write here your answer to question 5. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question5}
+# Insert Code Here
+
+
+
+```
+
+the assumptions of linearity and constant variability do not hold since the variability decreases when moving towards the positive x direction. The values funnel towards the x axis so this violates the homocedasticity rule. The relationship between the predictor and the response is linear so that rule isn't violated, and the disitrbution of the residuals does look like a normal distribution even if it does have a left skew. Since only one of these needs to be false to say that the assumptions don't hold, they don't.
+
+
+
+.<!---- Answer to Question 5 ends here ----->
+
+
+
+
+

@@ -1,0 +1,80 @@
+---
+title: "Week 5 soc"
+author: "Blue"
+date: "2023-07-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+library(tidytext)
+library(dplyr)
+library(magrittr)
+co_river<- read_csv('guardian_co_river.csv')
+head(co_river)
+co_river %>%
+  head(1000)
+
+tidy_co <- co_river %>%
+  unnest_tokens(word, body_text)%>%
+  anti_join(stop_words)
+#create dataset of word counts
+
+tidy_co_counts <- tidy_co %>%
+  count(id, word, sort = TRUE)
+
+
+co_dtm <- tidy_co_counts%>%
+  cast_dtm(id,word,n)
+
+library(topicmodels)
+ co_lda <- LDA(co_dtm,2, control = list(seed=1))
+
+
+co_topic <-tidy(co_lda, matrix = "beta")
+
+library(ggplot2)
+ggplot(co_top_terms, aes(beta, term, fill = factor(topic))) +
+geom_col(show.legend = FALSE)+
+facet_wrap(~ topic, scales = "free")+
+scale_y_reordered()
+
+library(tidyr)
+beta_wide <- co_topics%>%
+  mutate(topic = paste0("topic", topic))%>%
+  pivot_wider(names_from = topic,values_from = beta)%>%
+  filter(topic1>.001 | topic2>.001)%>%
+  mutate(log_ratio = log2(topic2/topic1))
+
+co_documents %>%
+  filter(document == "word/blag blag blah")
+
+
+```
+
+
+co_top_terms <- co_topics %>%
+group_by(topic)%>%
+slice_max(beta, n = 10)%>%
+ungroup()%>%
+arrange(topic, -beta)%>%
+mutate(term = reorder_within(term, beta, topic))
+
+```{r}
+library(ggplot2)
+library(readr)
+LP <- read_csv("LAKEPOWELL.csv")
+ggplot(LP,aes(x= Date, y = Elevation (feet)))+
+  geom_line(col = 'dodgerblue')+
+  geom_ribbon(aes(ymin = 3300),
+                  ymax = max('Elevation (feet)'),
+                  fill = 'lightblue3')+
+  lims(y=c(3300,3750))+
+  geom_hline(yintercept = 3490)+
+  annotate("text", x = as.POSIXct("1980-07-01"), y = 3500)+
+label = "Minimum Power Pool (3490')"
+```

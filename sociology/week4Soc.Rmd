@@ -1,0 +1,131 @@
+---
+title: "week4assign"
+author: "Blue"
+date: "2023-07-23"
+output: html_document
+---
+Choose a topic related to climate change. Use the RedditextractoR package to get the thread content of posts related to this topic. Put your data in tidytext format, and show the first 6 rows of the threads and comments, separately.
+
+I will use the topic of recycling
+
+```{r step1, eval = FALSE}
+library(RedditExtractoR)
+library(dplyr)
+library(tidytext)
+
+recycling_subreddits <- find_subreddits("recycling")
+
+recycling_urls <- find_thread_urls(keywords = "recycling")
+
+recycling_comments <- get_thread_content(recycling_urls$url)
+
+tidy_comments <- recycling_comments$comments %>%
+   unnest_tokens(word, comment) %>%
+  anti_join(stop_words)
+
+tidy_threads <- recycling_comments$title %>%
+   unnest_tokens(word, title) %>%
+  anti_join(stop_words)
+
+head(tidy_comments,6)
+head(tidy_threads, 6)
+
+
+```
+
+```{r step1b}
+library(RedditExtractoR)
+library(dplyr)
+library(tidytext)
+library(readr)
+library(stringr)
+load("climate_comments.RData")
+recycling_comments <- climate_comments$comments %>%
+filter(str_detect(comment, 'recycling'))
+
+recycling_threads <- climate_comments$threads %>%
+filter(str_detect(title, 'recycling')) ## part 4 use this!
+
+
+tidy_comments <- recycling_comments %>%
+   unnest_tokens(word, comment) %>%
+  anti_join(stop_words)
+
+tidy_threads <- recycling_threads %>%
+   unnest_tokens(word, title) %>%
+  anti_join(stop_words)
+
+head(tidy_comments,6)
+head(tidy_threads, 6)
+
+
+```
+
+
+Using the NRC lexicon, create a chart of sentiment for your comments or threads, similar to the one in section 4.3. BONUS: try comparing the sentiment of your comments and threads!
+
+```{r step2}
+library(dplyr)
+library(magrittr)
+
+tidy_comments %<>%
+  inner_join(get_sentiments("nrc"))
+
+# take a look
+tidy_comments %>%
+  select(word, sentiment)
+
+library(ggplot2)
+ggplot(tidy_comments, aes(y = sentiment))+
+  geom_bar(aes(fill = sentiment))+
+  theme_minimal()+
+  labs(title = "Sentiments in recycling Reddit Posts")
+
+```
+Now, download the Reddit Climate Change dataset from Kaggle here. Read in the data and create the tidy_cc dataset that we created in section 4.3. Then, choose a lexicon (Bing, NRC, or AFINN), and graph the post sentiments according to their scores (similarly to what we did in section 4.3). What do you find?
+
+```{r step3}
+library(readr)
+library(ggplot2)
+csvFile <- read_csv("the-reddit-climate-change-dataset-posts.csv")
+
+tidy_cc <- csvFile %>%
+   unnest_tokens(word, title)
+
+tidy_cc %<>%
+  anti_join(stop_words) %>%
+  inner_join(get_sentiments("bing"))
+
+ggplot(tidy_cc, aes(score)) +
+    facet_wrap(vars(sentiment))+
+  geom_bar()+
+  xlim(0,20)+
+ylim(0,50000)
+```
+negative sentiment gets much more attention and upvotes than positive sentiment.
+
+
+Limit the climate change Reddit posts in some way (for example, you can filter them to posts about Cape Town, or some other place or event, such as the IPCC, or Australian Wildfires). Choose a lexicon (Bing, NRC, or AFINN), and plot the sentiment over time. Can you explain the volatility? BONUS: Plot all three dictionaries. Do you find differences between them?
+```{r step4}
+library(dplyr)
+library(readr)
+library(tidyverse)
+library(tidyr)
+library(tidytext)
+tidy_cc<- tidy_cc %>%
+filter(domain == 'cnn.com')
+
+ggplot(tidy_cc, aes(x= (created_utc %/% 31556926)+1970, y = score)) +
+    facet_wrap(vars(sentiment))+
+  geom_point()
+  
+
+
+```
+sentiment for both positive and negative spikes around mid spetember of 2018. This could be due to Hurricane florence which hit around the same time. This would explain the mostly negaitve sentiment.
+
+
+
+Considering disasters such as the Cape Town Water Crisis and Hurricane Katrina, reflect on the implications of people’s sentiments for broader social behaviors. What can we learn by analyzing the sentiments of what people say? Describe another source of text data for which you would like to analyze sentiment related to a disaster, and explain why this would be interesting. Could governments or other organizations benefit from the analysis you describe?
+
+people sentiments can show how the community will respond to a crisis. For example, if sentiment is very negative before the cape town water crisis that could indicate that people are ready to flee or hoard water, however, if sentiment were positive it could show that people were ready to work together and beat the water crisis. By analyzing sentiment, we could discover the popularity of political ideas, we could see how people feel about political figures, scandals, and foreign affairs. It would be really interesting comparing sentiment between instagram posts and Reddit posts since reddit is more of a carefree fun place where people will joke around and instagram is a place people use to express their political ideas. the government could use sentiment analysis to make sure that the popoulation is happy without using a costly survey, they could use it to know which way the population wants the government to steer.

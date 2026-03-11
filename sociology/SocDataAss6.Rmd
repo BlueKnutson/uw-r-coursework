@@ -1,0 +1,167 @@
+---
+title: "SocDataAss6"
+author: "Blue"
+date: "2023-08-04"
+output:
+  word_document: default
+  html_document: default
+---
+
+1) Read the North Carolina shapefile into R using the process described in section 6.1. Then plot the data using ggplot2. Use a variable other than AREA to fill the shapes, and try using one of the scale_fill_ arguments to create a red color scale. See these notes on color scales with ggplot for some theory and ideas here.
+
+
+```{r}
+library(sf)
+library(ggplot2)
+library(viridis)
+library(rgdal)
+nc <- st_read(system.file("shape/nc.shp", package="sf")) #reading in data
+
+ggplot(nc)+
+  geom_sf(aes(fill = PERIMETER))+
+  scale_fill_gradient(low = 'white', high = 'darkred')
+
+```
+
+
+2) Read in the CDP hazards data and cities location data from Canvas (“cdp_hazards.csv” and “CDP-Cities-geographical-coordinates.csv”), and plot the cities according to at least one of the hazards. Discuss your graph and what conclusions you might draw about the geographies of risk.
+
+```{r}
+library(readr)
+library(sf)
+library(ggplot2)
+library(dplyr)
+cdp_hazards <- read_csv("cdp_hazards.csv")
+cdp_cities <- read_csv("CDP-Cities-geographical-coordinates.csv")
+
+
+
+cdp_cities <- cdp_cities %>%
+  rename('Account Number' = Account.Number) %>%
+  dplyr::select('Account Number', lat, long)
+
+cdp_hazards <- cdp_hazards %>%
+  left_join(cdp_cities) %>%
+  filter(hazard %in% c("Heat wave", "Drought", "Coastal flood"))
+
+
+
+cdp_hazards <- st_as_sf(cdp_hazards, coords = c("long", "lat"))
+
+ggplot(cdp_hazards) +
+  geom_sf(aes(color = hazard)) +
+  scale_color_viridis(discrete = TRUE) 
+ 
+
+
+
+
+```
+heat waves are much more common farther away from the ocean, I'm guessing since the ocean does a good job of keeping the temperature steady. There are also way fewer reported disasters in Asia although I can't be sure if that's because of the dataset not prioritizing Asia or if there are simply fewer natural disasters there. What did surprise me was that there were few heat waves around the equator since that is the hottest part of the earth.
+
+
+3) Now do the same thing, but for the CDP actions data (“cdp_actions.csv”). Do you notice any differences between the cities facing hazards and those that are taking actions?
+```{r}
+library(readr)
+library(dplyr)
+
+cdp_actions <- read_csv("cdp_actions.csv")
+
+# Print the column names in the cdp_actions data
+print(colnames(cdp_actions))
+
+cdp_actions <- cdp_actions %>%
+  left_join(cdp_cities) %>%
+  filter(action %in% c("Heat wave", "Drought", "Coastal flood"))
+
+# Rest of the code for plotting
+
+
+library(sf)
+library(ggplot2)
+
+cdp_actions <- st_as_sf(cdp_actions, coords = c("long", "lat"))
+
+ggplot(cdp_actions) +
+  geom_sf(aes(color = action)) +
+  scale_color_viridis(discrete = TRUE)
+
+
+
+```
+The cities taking action are largely clustered around the coast. This could be that coastal cities are richer and because of it able to take action against disasters.The places that are taking action are also highly clustered around the places that are recieving the most disasters which makes sense since there needs to be a large demand to warrent a reaction to it.
+
+4) Use the tigris function to download shapefiles of your choice. Plot the data using ggplot()
+```{r}
+library(tigris)
+library(ggplot2)
+
+school <- school_districts(state = "CA")
+counties <- counties(state = "CA")
+waterArea <- area_water(state = "CA", county = ("San Francisco"))
+#landmarks <- landmarks(state = "WA")
+
+
+ggplot()+
+  geom_sf(data = counties)+
+  geom_sf(data = waterArea)
+  
+
+
+```
+
+5) Download one of the clean AQI monitor datasets from Canvas (“aqi22_clean_us.csv” or “aqi22_clean_ca.csv”) and plot these inside the boundaries that you have downloaded from tigris. Then, calculate the average PM2.5 levels in each of the geographical units, and plot your geographies again according to these levels (as we did in section 6.5). Which areas had the best (and worst) air quality in 2022? What are the implications?
+
+```{r}
+library(readr)
+library(magrittr)
+library(dplyr)
+library(tigris)
+library(ggplot2)
+library(sf)
+
+counties <- counties(state = "CA")
+aqi22<-read_csv("aqi22_clean_ca.csv")
+
+ggplot() +
+  geom_sf(data = counties, fill = NA, color = "black") +
+  geom_point(data = aqi22, aes(x = X, y = Y, color = `Observation Percent`), size = 2) +
+  scale_color_viridis_c() +
+  theme_minimal()
+aqi22 %<>%
+  st_as_sf(coords = c("X", "Y")) 
+
+aqi22 %<>%
+  st_set_crs(st_crs(counties))
+
+aqi22 %<>%
+  filter(`Pollutant Standard` == "PM25 24-hour 2012" & 
+           `State Name` == "California")
+
+ggplot(aqi22)+
+
+  geom_sf(data = counties)+
+  geom_sf(aes(col = `Arithmetic Mean`))+
+  scale_color_viridis(option = "magma", direction = -1)+
+  theme_minimal()+
+  labs(col = "PM2.5 Average")
+
+counties %<>%
+  st_join(aqi22)
+
+counties %<>%
+  group_by(GEOID)
+counties %<>%
+  summarise(mn_aqi = mean(`Arithmetic Mean`, na.rm = T))
+
+ggplot(counties)+
+  geom_sf(aes(fill = mn_aqi))+
+  scale_fill_viridis(option = "magma", direction = -1)+
+  theme_minimal()+
+  labs(fill = "PM2.5 Average")
+
+View()
+```
+ Which areas had the best (and worst) air quality in 2022? What are the implications?
+kern to san joaquin connected in a straight line covers all of the counties with the worst air quality. The counties that have the worst air quality are the ones that are focussed on farming and is encircled by mountains. This could trap bad air inside the "valley" and make it difficult to farm since bad air quality negatively effects the growth of plants. The counties with national forests tend to have much bettwe air quality.
+

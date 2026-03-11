@@ -1,0 +1,153 @@
+---
+title: "HW2 394"
+author: "Blue"
+date: "2025-01-25"
+output: html_document
+---
+
+1. (Heads or Tails) Suppose 6 fair coins are tossed and the outcome (head or tail) is recorded for each.
+
+a. The sample space S corresponding to this “experiment” consists of all possible sequences of heads
+and tails that result from tossing 6 coins. How many elements are in S? Calculate the answer in a
+code chunk, save it to a variable called num_S and then print the value. Also give a brief explanation
+that connects your reasoning for solving this problem with the calculation for the Braille alphabet in
+example 3.2.
+```{r}
+
+numCoins = 6
+possibilities = 2
+
+num_S = 2**6
+num_S
+
+
+```
+This problem uses the same exact method and numbers as the braille example since in both examples, there are 6 binary options and the goal is to figure out the total possibilities. the formula is #choices^#options.
+
+b. Let E denote the event that 4 of the 6 coins land on heads. How many elements are in E? Calculate
+this number in a code chunk, save your answer in a variable called num_E and print the value. Again, in
+your explanation, be sure to connect the reasoning for solving this problem by describing the calculation
+for an analogous event in Braille alphabet example.
+
+```{r}
+
+num_E <- choose(6,4)
+num_E
+
+```
+as mentioned before, this is the same type of data as the braille example. there are 6 total variables with 2 options for each variable. the choose methods calculates how many possible configurations there are given the set size and the amount of variables one chooses.
+
+c. Give the formula for P (E) and then calculate it in a code chunk and save it to variable called prob_E
+and print the value. Be sure to cite any rules you are using to make your theoretical probability
+calculation.
+```{r}
+
+prob_E <- num_E/num_S #Equally likely rule
+prob_E
+
+```
+
+2. (Tagging goldfish) To estimate the number N of goldfish in a pond, r = 25 fish were caught, tagged and
+released. Later, a second sample of n = 20 fish were caught and 5 fish in this sample were noted to be 1
+tagged.
+
+a. How many possible samples of size n = 20 can be formed from the N fish in the pond? Leave your
+answer in terms of a binomial coefficient since you cannot calculate it because you don’t know N . Also
+give a brief explanation that connects your reasoning for solving this problem with the calculation for
+the sampling of defective microwave ovens from the Chapter 3 quiz.
+
+
+N = total number of fish
+
+choose(N,20)
+
+the reason I chose to use "choose(N,20)" is because we are choosing 20 fish out of a possible N total fish. This is similar to the oven problem because in that one we were choosing 4 ovens out of 30 total ovens. It's the same type of question and will use the same methods to solve.
+
+
+
+
+b. The event E contains all the samples which have 5 tagged and 15 untagged fish. How many elements are
+in the event E? Leave your answer in terms of N . Again, in your explanation, be sure to connect the
+reasoning for solving this problem by describing the calculation for an analogous event in the sampling
+of defective microwave ovens scenario from the Chapter 3 quiz.
+
+tagged_fish = 25
+choose(N-tagged_fish, 15) * choose(tagged_fish,5)
+
+in the oven problem we used (choose(25,2)) * (choose(5,2)) because we were choosing 2 normal ovens from the 25 normal ovens and 2 defective ovens from the 5 defective ovens. In this problem I chose 15 normal fish from N-tagged_fish and 5 tagged fish from the 25 total tagged_fish. These problems have the same stucture which lets me use the same methods to solve them.
+
+c. Assuming each possible sample is equally likely, give an expression for P (E). (Leave your answer in
+terms of N )
+
+tagged_fish = 25
+P(E) = (choose(N-tagged_fish, 15) * choose(tagged_fish,5))/choose(N,20)
+
+d. In this part, we will examine visually how P (E) varies as a function of N . Fill in the blanks in the R
+code provided and run it in R to create the plot. You should remove the eval = FALSE chunk
+option after filling in the blanks
+```{r}
+library(ggplot2)
+library(tibble)
+tagged_fish = 25
+fishes <- tibble( 
+N = 40:200, 
+prob = (choose(N-tagged_fish, 15) * choose(tagged_fish,5))/choose(N,20) )
+ggplot(data = fishes,
+  mapping = aes(x = N,
+  y = prob) ) +
+  geom_line() +
+  labs( title = "P(E) based on population size" ,
+  x = "N",
+  y = "P(E)")
+```
+
+e. If all went well, your graph should be unimodal with a peak at N = 100. Just conceptually, explain
+what this pattern tells us about P (E) and why it makes sense.
+This pattern tells us that as the population gets closer to 100, the probrability that one would choose 15 normal fish and 5 tagged fish out of the whole population peaks. This makes sence because thats where the propotions of tagged fish to tagged fish chosen and untagged fish to untagged fish chosen is the same (15/75 = 5/25)
+
+3. (Unions) Let A and B be independent events, with P (A) ≥ 0.5 and P (B) ≥ 0.2. Show that
+P (A ∪ B) ≥ 0.6
+
+
+
+
+If you copy and paste this question into our good friend ChatGPT, you will get the solution shown in
+the file HW2-chatgpt.pdf. Steps 1 and 2 are well done. However, Step 3 is incorrectly/insufficiently
+argued, in particular, the argument made at the end for why P (A ∪ B) is an increasing function of a
+and b is inexplicable. How would you rectify the error made here? Go ahead and rewrite just step 3 to
+finish the proof correctly.
+
+$$P(A)+P(B) - P(A\cap B)$$
+$$P(A) + P(B) -P(A)*P(B)$$
+f(a,b) = a+b
+df/da = 1
+df/db = 1
+
+g(a,b) = a*b
+dg/db = a
+dg/da = b
+
+since all A and B are > 1 (since A - min(B) = .8), a+b grows faster than a*b, so with the starting point .5+.2-(.5(.2) = .6, any increase in a or b will lead to an answer higher than .6 so, P (A ∪ B) ≥ 0.6
+
+4. (Dependent) Let A, B and C be such that P (A) = 1/2, P (B ∩ C) = 2/3 and P (A ∩ Bc) = 1/4. Show
+that A and B are not independent.
+The solution from ChatGPT is shown in the file HW2-chatgpt.pdf. Again, Steps 1 and 2 are well done.
+
+$$P(A) = 1/2$$
+$$P(B \cap C) = 2/3$$
+$$P(A \cap B^c) = 1/4$$
+1) since $$P(A) = P(A \cap B) + P(A \cap B^c)$$,
+$$.5 = P(A \cap B) +.25$$
+$$ .25 = P(A \cap B)$$
+if $$P(A \cap B) != P(A)P(B)$$ then A and B are dependent, so as longs as B isnt 1/2 A and B are dependent.
+Since $$P(B \cap C) = 2/3$$, $$P(B) >= 2/3$$ and since P(B) >= 2/3 which is always not 1/2, A and B are dependent.
+
+
+
+
+
+
+
+
+
+

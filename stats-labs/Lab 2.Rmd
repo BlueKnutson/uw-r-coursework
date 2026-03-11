@@ -1,0 +1,95 @@
+---
+title: "Lab 2 Blue Knutson"
+author: "Blue"
+date: "2025-01-15"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+
+library(tidyverse)
+library(openintro)
+data(nycflights)
+ggplot(data = nycflights, aes(x = dep_delay))+
+  geom_histogram()
+
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(bins = 50)
+
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(bins = 150)
+
+
+
+```
+with 150 bins we can see the most detail from our dataset since there are more bins than the other 2. even though there ismore detail, having more bins doesn't really tell you more in this scenario than the lower bin levels so it could be wise to stay simple and use smaller bin counts.
+
+
+
+```{r}
+to_lax_flights <- nycflights%>% filter(dest == "LAX")
+ggplot(data = to_lax_flights, aes(x = dep_delay))+
+  geom_histogram(bins = 50)
+
+```
+
+
+
+
+
+
+
+```{r}
+to_lax_flights %>% summarise(avg_deep_delay = mean(to_lax_flights$dep_delay),med_dep_delay = median(to_lax_flights$dep_delay), freq = frequency(to_lax_flights$dep_delay))
+
+mean(to_lax_flights$dep_delay)
+median(to_lax_flights$dep_delay)
+frequency(to_lax_flights$dep_delay)
+
+summary(to_lax_flights)
+```
+
+
+```{r}
+sfo_feb_flights <- nycflights %>%
+  filter(dest == "SFO", month == 2)
+
+count(sfo_feb_flights)
+
+#view(sfo_feb_flights)
+```
+
+
+```{r}
+
+sfo_feb_flights %>% 
+  group_by(carrier) %>%
+  summarize(avgDel = mean(arr_delay, na.rm = TRUE))%>%
+  arrange(desc(avgDel))
+
+```
+AA has the highest average delay
+
+
+
+```{r}
+
+nycflights %>%
+  group_by(month) %>%
+  summarise (mean_dd = mean(dep_delay))%>%
+  arrange(desc(mean_dd))
+
+
+```
+
+
+```{r}
+
+nycflights %>%
+  group_by(month) %>%
+  summarise (mean_dd = mean(dep_delay))%>%
+  arrange(desc(mean_dd))
+
+
+```

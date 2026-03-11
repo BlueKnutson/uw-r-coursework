@@ -1,0 +1,66 @@
+---
+title: "Instagram"
+author: Blue Knutson
+date: today
+format: 
+  revealjs:
+    theme: dark
+    incremental: false
+    slide-number: true
+    footer: "INFO 201"
+    embed-resources: true
+  html: 
+    footer: "Instagram presentation"
+---
+
+## What is Instagram?
+
+Instagram is a social media platform primarily focused on sharing **photos and videos**.
+
+- Post images and videos
+- Follow other users
+- Like and comment on content
+- Share Stories and Reels
+
+
+## History
+
+- **Released:** October 6, 2010  
+- **Developed by:** Kevin Systrom and Mike Krieger  
+- **Acquired by:** Facebook (now Meta) in 2012  
+
+## How to Access
+- Mobile app for **iOS and Android**  
+- Web version: [instagram.com](https://www.instagram.com)  
+- Available on tablets as well
+![Instagram Logo](https://ichef.bbci.co.uk/ace/standard/976/cpsprodpb/E802/production/_89649395_instagram_logo_976.jpg)
+
+## Key Features
+
+1. Stories: temporary posts that disappear after 24 hours  
+2. Reels: short-form video content  
+3. Direct Messages: private messaging  
+4. Explore: discover new content and accounts  
+
+
+---
+
+## Fun Facts
+
+:::: {.columns}
+
+::: {.column width="40%"}
+- Over **2 billion users worldwide**  
+- Popular among influencers and brands  
+
+:::
+
+::: {.column width="50%"}
+- Frequent updates with new features  
+- Supports advertising and shopping directly in-app  
+:::
+
+::::
+
+
+

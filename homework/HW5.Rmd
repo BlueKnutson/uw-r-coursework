@@ -1,0 +1,203 @@
+---
+title: "HW5"
+author: "Blue"
+date: "2025-02-25"
+output: html_document
+---
+
+1)(Blood type) In the US population, 85% have an agglutinating factor in their blood classifying them as
+Rh positive, while 15% lack the factor and are Rh negative. A medical researcher wants to analyze
+blood from a newborn Rh negative infant, so she examines the blood types of successive newborn
+infants until she finds an Rh negative infant.
+
+a. Let the random variable X denote the number of Rh positive infants she needs to type before she finds
+the first negative case. Write the distribution of X. Be sure to state the values of any parameters. List
+the assumptions you need to make to answer this question.
+
+X ~ Geometric(.15)
+
+Asumptions: each birth is independent so the bith of one child could not impact the odds of blood types in another baby born (no identical twins being born). We also asume that each baby has a 15% chance of having Rh negative and an 85% chance of Rh positive. and these are the only two outcomes. We also assume that the sampling will stop once a baby that is Rh negative is found.
+
+b. How many Rh positive infants should she expect to type before she finds her first Rh negative? State
+the formula you are using, then calculate and print it in a code chunk and then report your answer in a
+complete sentence in context.
+
+$$E(X) = (1-p)/p$$
+
+```{r}
+p = .15
+e = (1-p)/p
+
+
+```
+
+We expect that we will have to sample on average 5.67 babies until we find one that is Rh negative.
+
+c. What is the probability that she will type more Rh positive infants than expected? Give the expression
+for this probability here, do not calculate it yet.
+
+P(X>5)
+
+d. Calculate the probability from part c using your expression and also a built in R function for working
+with the distribution from part a. Be sure to echo your code chunk and report your answers.
+
+```{r, echo=TRUE}
+pgeom(5, prob = p, lower.tail = FALSE)
+
+
+```
+The probability that she will type more Rh positive infants than expected is .3771
+
+(Memoryless) Let X be a geometric random variable with probability π. That is,
+f (x) = π · (1 − π)x, x = 0, 1, 2 . . .
+a. Show that for all non-negative integers x and k,
+P (X ≥ k + x|X ≥ k) = P (X ≥ x).
+Be sure to show your steps.
+
+$$P (X ≥ k + x|X ≥ k) = p(X >= k+x)/P(X>=k)$$
+$$P(X>= n) = \sum P(X = j)$$
+$$P(X = j) = \pi (1-\pi)^j$$
+$$P(X>=n) = \sum \pi (1-\pi)^j$$
+$$r = (1- \pi)$$
+$$P(X >= n) = \pi (1-\pi)^n/1-(1-\pi) = (1-\pi)^n$$
+
+$$P(X >= k+x) = (1-\pi)^{(k+x)}$$
+$$P(x > = k) =(1-\pi)^k$$
+$$P(X >= k+x | x > = k) = (1-\pi)^{k+x-k} = (1-\pi)^x$$
+
+therefore, $$P (X ≥ k + x|X ≥ k) = P (X ≥ x).$$
+
+b. Because of the result in part a, we say that the geometric distribution is a memoryless distribution.
+Explain how this is an appropriate name for this property.
+
+Memoryless is an appropriate name for this property since it means that previous results don't impact the odds of future results. What has happened in the past does not matter because it does not impact future results
+
+
+3. (Insecticide) A large number of insects are expected to be attracted to a variety of rose plant. A
+commercial insecticide is advertised as being 99% effective. Suppose 2,000 insects infest a rose garden
+where the insecticide has been applied and let X denote the number of surviving insects.
+
+a. What probability distribution might provide the most accurate model for this experiment? Be sure to
+give the reasons for why.
+
+Binomical. There are a fixed # of trials (2000), two outcomes survive or death, contant probabilities (each insect has a 99% chance of dying), and the outcome of one insect's fate does not impact another insect's fate (assumption).
+
+b. Calculate the probability that fewer than 10 insects survive, using the model from part a. Be sure to
+show your code and output.
+```{r}
+
+p = .01
+n = 2000
+print(pbinom(9,size =n, prob = p))
+
+
+```
+the probability that fewer than 10 insects survive is 0.00483677
+
+
+c. What other probability distribution might be more computationally convenient and would provide a
+good approximation? Be sure to state the name and values of any parameters.
+
+the Poisson approximation. n = 2000, p = .01, λ = np = 20
+
+d. Calculate an approximation to the probability from part b using the model from part c
+
+```{r}
+lambda_poisson <- 20
+
+print(ppois(9, lambda = lambda_poisson))
+
+```
+e. Be sure to show your code and output.
+The approximation is 0.004995412
+
+
+
+4. (Apple trees) From each of 6 trees in an apple orchard, 25 leaves are selected. On each of the leaves,
+the number of adult mites are counted.
+
+a. Using R as a calculator, write code to find  ̄x, the mean number of adult mites found. Be sure to show
+your code and the output!
+```{r}
+
+x <- c(0, 1, 2, 3, 4, 5, 6, 7, 8)
+freq <- c(70, 38, 17, 10, 9, 3, 2, 1, 0)
+
+mean_x <- sum(x * freq) / sum(freq)
+print(mean_x)
+```
+
+b. Let X denote the number of mites on a randomly selected leaf. In this question, you will consider two
+possible models for X:
+X ~ pois(lambda = xBar)
+X ~ geom(1/1+xBar)
+
+```{r}
+library(ggplot2)
+library(tibble)
+pois_probs <- dpois(x, lambda = mean_x)
+geom_probs <- dgeom(x, prob = 1 / (1 + mean_x))
+total_obs <- sum(freq)
+
+pois_df <- data.frame(x = x, probability = pois_probs)
+geom_df <- data.frame(x = x, probability = geom_probs)
+obs_prop <- freq / total_obs  
+
+
+geom_df <- tibble(
+x = 0:8,
+geomPMF1 = pois_probs,
+geomPMF2 = geom_probs,
+obs_prop = obs_prop,
+)
+
+library(patchwork) 
+p1 <- ggplot(data = geom_df,
+mapping = aes(x = x, y = geomPMF1) ) +
+geom_col(width = 1, alpha = 0.5, fill = "gold", color = "purple")+
+geom_point(aes(y = obs_prop), color = "red", size = 3) +
+labs(x = "poisson",
+y = "PMF",
+title = expression(X %~% Pois(lambda =bar(x) )))
+
+
+p2 <- ggplot(data = geom_df,
+mapping = aes(x = x, y = geomPMF2) ) +
+geom_col(width = 1, alpha = 0.5, fill = "gold", color = "purple")+
+geom_point(aes(y = obs_prop), color = "red", size = 3) +
+labs(x = "Geometric",
+y = "PMF",
+title = expression(X %~% Geom(pi == 0.4658384 )))
+
+
+p1+p2
+
+
+
+
+```
+
+```{r}
+
+obs_vs_pred <- tibble(
+  x = 0:7,
+  obs_prop = obs_prop[1:8], 
+  pred_pois = pois_df$probability[1:8],
+  pred_geom = geom_probs[1:8]
+)
+obs_vs_pred
+
+```
+
+
+
+d. Which model - the Poisson or Geometric – seems to fit this data better?
+Geometric seems to fit the distribution much better. When the observed proportions are layed on top of the plots, the geometric one lines up significantly better than the poisson apporximation.
+
+
+
+
+
+
+
+

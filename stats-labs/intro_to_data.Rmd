@@ -1,0 +1,236 @@
+---
+title: "Introduction to data"
+---
+
+```{r global-options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, results = FALSE, fig.show = "hide", message = FALSE)
+```
+
+Statistics is often described as the field that transforms raw information into meaningful knowledge. 
+
+The first step in this process is to summarize and describe the data. In this lab, we focus on domestic flights, specifically a random sample of flights departing from three major New York City airports in 2013. We will create basic graphical and numerical summaries to explore various aspects of these flights, including delay times. 
+
+While working with the data, you will learn the basic tools of data manipulation and data visualization.
+
+## Getting started
+
+### Load packages
+
+In this lab, we will explore and visualize the data using the **tidyverse** suite of packages. The data can be found in the package **openintro**.
+
+Let's load the packages (note in `R` the words libraries and packages are used interchengeably!).
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Creating a reproducible lab report
+
+Remember that we will be using R Markdown to create reproducible lab reports.
+In RStudio, go to New File -\> R Markdown... Then, choose From Template and then choose `Lab Report for OpenIntro Statistics Labs` from the list of templates.
+
+See the following video describing how to get started with creating these reports for this lab, and all future labs:
+
+[**Basic R Markdown with an OpenIntro Lab**](https://www.youtube.com/watch?v=Pdc368lS2hk) <iframe width="560" height="315" src="https://www.youtube.com/embed/Pdc368lS2hk" frameborder="0" allowfullscreen></iframe>
+
+### The data
+
+The [Bureau of Transportation Statistics](http://www.rita.dot.gov/bts/about/) (BTS) is a statistical agency that is a part of the Research and Innovative Technology Administration (RITA).
+As its name implies, BTS collects and makes transportation data available, such as the flights data we will be working with in this lab.
+
+First, we'll view the `nycflights` data frame.
+Type the following in your console to load the data:
+
+```{r load-data}
+data(nycflights)
+```
+
+The data set `nycflights` that shows up in your workspace is a *data matrix*, with each row representing an *observation* and each column representing a *variable*.
+R calls this data format a **data frame**, which is a term that will be used throughout the labs.
+For this data set, each *observation* is a single flight.
+
+To view the names of the variables, type the command
+
+```{r names}
+names(nycflights)
+```
+
+This returns the names of the variables in this data frame.
+The **codebook** (description of the variables) can be accessed by pulling up the help file:
+
+```{r help}
+?nycflights
+```
+
+One of the variables refers to the carrier (i.e. airline) of the flight, which is coded according to the following system.
+
+-   `carrier`: Two letter carrier abbreviation.
+
+    -   `9E`: Endeavor Air Inc.
+    -   `AA`: American Airlines Inc.
+    -   `AS`: Alaska Airlines Inc.
+    -   `B6`: JetBlue Airways
+    -   `DL`: Delta Air Lines Inc.
+    -   `EV`: ExpressJet Airlines Inc.
+    -   `F9`: Frontier Airlines Inc.
+    -   `FL`: AirTran Airways Corporation
+    -   `HA`: Hawaiian Airlines Inc.
+    -   `MQ`: Envoy Air
+    -   `OO`: SkyWest Airlines Inc.
+    -   `UA`: United Air Lines Inc.
+    -   `US`: US Airways Inc.
+    -   `VX`: Virgin America
+    -   `WN`: Southwest Airlines Co.
+    -   `YV`: Mesa Airlines Inc.
+
+Remember that you can use `glimpse` to take a quick peek at your data to understand its contents better.
+
+```{r glimpse}
+glimpse(nycflights)
+```
+
+The `nycflights` data frame is a massive trove of information.
+Let's think about some questions we might want to answer with these data:
+
+-   How delayed were flights that were headed to Los Angeles?
+-   How do departure delays vary by month?
+-   Which of the three major NYC airports has the best on time percentage for departing flights?
+
+## Analysis
+
+### Using the `dplyr` functions
+
+Before we delve into the data analysis, here are some basic operations we will be carrying out and here are the commands to perform them.
+
+#### Data manipulation and summaries
+
+* `filter()` for filtering (this is a function contained in `dplyr` and `tidyverse`)
+
+```{r}
+# Filter flights with departure delay greater than 60 minutes
+nycflights %>%
+  filter(dep_delay > 60)
+
+# Filter flights from JFK in January
+jfk_jan_flights <- nycflights %>%
+  filter(origin == "JFK", month == 1)
+
+# View the first few rows of these flights
+head(jfk_jan_flights)
+```
+
+Let's decipher the above commands:
+
+- Command 1: Take the `nycflights` data frame, `filter` for flights with a delay at departure greater than 60 minutes.
+
+- Command 2:  Take the `nycflights` data frame, `filter` for flights who left from 'JFK', and save the result as a new data frame called `jfk_jan_flights`.
+
+- Command 3: prints the first 6 rows of `jfk_jan_flights`
+
+A few comments:
+
+    -   `==` means "if it's equal to".
+    -   `LAX` is in quotation marks since it is a character string.
+
+::: {#boxedtext}
+**Logical operators:** Filtering for certain observations (e.g. flights from a particular airport) is often of interest in data frames where we might want to examine observations with certain characteristics separately from the rest of the data.
+To do so, you can use the `filter` function and a series of **logical operators**.
+The most commonly used logical operators for data analysis are as follows:
+
+-   `==` means "equal to"
+-   `!=` means "not equal to"
+-   `>` or `<` means "greater than" or "less than"
+-   `>=` or `<=` means "greater than or equal to" or "less than or equal to"
+:::
+
+
+* Assigning objects in the Global Environment:
+
+```{r}
+# In order to assign the new data set in the Global Environment (and thus be able to reuse the data set) we use the `<-` operator:
+delayed_flights <- nycflights %>%
+  filter(dep_delay > 60)
+```
+
+* `group_by()` to group the data by a categorical variable. `group_by()` is often followed by `summarise()` which allows you to calculate specific statistics. Both functions are in the `tidyverse` suite of packages.
+
+```{r}
+# the following groups by carrier and calculates the average departure delays by removing missing values
+nycflights %>%
+  group_by(carrier) %>%
+  summarise(avg_dep_delay = mean(dep_delay, na.rm = TRUE))
+```
+
+* `arrange()` sorts the data in ascending or desceding order based ona sepcific variable:
+
+```{r}
+nycflights %>%
+  group_by(carrier) %>%
+  summarise(avg_dep_delay = mean(dep_delay, na.rm = TRUE)) %>%
+  arrange(desc(avg_dep_delay))
+```
+
+Note that in the `summarise` function you created a list of different numerical summaries that you are interested in for instance:
+
+```{r}
+nycflights %>%
+  group_by(carrier) %>%
+  summarise(avg_dep_delay = mean(dep_delay, na.rm = TRUE), median_dep_delay = median(dep_delay))
+```
+
+The names of these elements are user defined, like `mean_dd`, `median_dd`, `n`, and you can customize these names as you like (just don't use spaces in your names).
+Calculating these summary statistics also requires that you know the function calls.
+Note that `n()` reports the sample size.
+
+::: {#boxedtext}
+**Summary statistics:** Some useful function calls for summary statistics for a single numerical variable are as follows:
+
+-   `mean`
+-   `median`
+-   `sd`
+-   `var`
+-   `IQR`
+-   `min`
+-   `max`
+-   `n()` for frequency
+
+Note that each of these functions takes a single vector as an argument and returns a single value.
+:::
+
+
+Here are some of the most important data visualization we will use:
+
+* `ggplot()` in combination with `geom_histogram()` to produce histograms of a given variable
+
+```{r}
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram()
+```
+
+```{r hist-dep-delay-bins}
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 15)
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 150)
+```
+
+* `ggplot()` in combination with `geom_boxplot()` for box plots
+
+```{r}
+ggplot(nycflights) +
+  geom_boxplot(aes(x = factor(month), y = dep_delay))
+```
+
+* `ggplot()` in combination with `geom_point()` for scatterplots
+
+```{r}
+ggplot(nycflights) +
+  geom_point(aes(x = factor(month), y = dep_delay))
+```
+
+
+
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">![Creative Commons License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png){style="border-width:0"}</a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.

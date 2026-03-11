@@ -1,0 +1,156 @@
+---
+title: "Homework 3 394"
+author: "Blue"
+date: "2025-02-02"
+output: html_document
+---
+
+a. (Shelley) Below are the last five lines of Shelley’s poem Ozymandias
+
+"My name is Ozymandias, king of kings:
+Look on my works, ye Mighty, and despair!"
+Nothing beside remains. Round the decay
+Of that colossal wreck, boundless and bare
+The lone and level sands stretch far away
+
+Let X denote the length of a word which is randomly selected from those lines. What is X(boundless)?
+
+x(boundless) = 9 since there are 9 letters in "boundless"
+
+b. (Free throws) As part of the warm up drill, each player on a basketball team is required to shoot free
+throws until a basket is made. If Amy has a 80% success rate at the foul line, write the PMF of the
+random variable X that describes the number of misses before she completes the drill. Assume that
+individual throws constitute independent events.
+Write the PMF of X as a formula first, and then write a brief explanation below.
+
+
+$$f(x) = (1-P(S))^x*P(S)^1$$
+$$f(x) = .2^x*.8$$
+this formula account for x misses before a single shot with a probability of 80% is made. each event is independent of the last. .2 is raised to the power of x since there is a 20% chance of a miss x times and .8 is raised to the first power since only one shot will be scored.
+
+2)(Random walk) Suppose a particle moves 4 steps along the x-axis, starting at 0. At each step, it moves
+randomly one unit to the right or to the left.
+
+A)If you copy and paste the following question into ChatGPT: How many elements are in the sample space?
+Explain your answer very briefly , you will get the answer shown in the file HW3problem-chatgpt.pdf
+which is located in the COURSEMATERIALS/HOMEWORK folder.
+The number of elements is correctly calculated, however, there is an error made in the explanation for
+why. In your own words, describe the error and how you would fix it.
+
+ChatGPT claims that the number of elements in the sample space is 2^4 = 16 since each step has two possible outcomes and you are doing it 4 times. An error in it's explanation is that it says because each step is independent, you can calculate the sample space with 2^4. Independence does not matter when computing the sample space and chatGPT should not have mentioned it.
+
+b. Let E denote the event that the particle ends up at x = 0. Write the outcomes in E and calculate
+P (E). Since this is a binomial distribution since there are a fixed # of trials, each event is independent, probabilities stay constant, and only 2 outcomes per trial. This example fits all the critera so we can use the formula $$\binom{4}{2} \times (0.5)^2 \times (0.5)^2$$ to get .375. .375*16 = 6 so we know that there are 6 outcomes were x = 0. These possibilities are (RRLL), (RLRL), (RLLR), (LLRR), (LRLR), (LRRL)
+
+C. Now suppose the random variable X denotes the position of the particle after 4 steps. Write its PMF
+in a tabular format. I have created a partial table for you to fill in. Each row should contain a possible
+value x, then list the outcomes from the original sample space that give that possible value and the
+probability. (Hint: in part b you calculated P (X = 0).
+$$\begin{array}{|c|c|c|}
+\hline
+\text{X} & \text{outcomes from S} & f(X) \\
+\hline
+-4 & 1 & 0.0625 \\
+-2 & 4 & 0.25   \\
+0  & 6 & 0.375  \\
+2  & 4 & 0.25   \\
+4  & 1 & 0.0625 \\
+\hline
+\end{array}
+$$
+
+
+
+d) Create a code chunk and write code to draw the probability histogram of X, the position of the particle
+after 4 steps. Please see the slidedeck on chapter 6 for sample code. Be sure to give labels and a title.
+Do not use any code that you have not been taught in this class
+
+```{r}
+library(tidyverse)
+
+
+bud <- tibble(
+  x = c(-4,-2,0,2,4),
+  f = c(.0625, .25,.375,.25,.0625)
+)
+
+# make probability histogram
+ggplot(data = bud,
+mapping = aes(x=x, y=f) ) +
+geom_col(width = 1, fill = "gold", color = "purple", alpha = 0.5)+
+labs(x = "ending x", y = "probability", title = "equal probability histogram")
+
+
+
+
+
+```
+```{r}
+
+
+(1/3)**4 #prob of -4
+choose(4,3)*((1/3)**3)*((2/3)**1) #prob of -2
+choose(4,2)*((1/3)**2)*((2/3)**2) # prob of 0
+choose(4,1)*((1/3)**1)*((2/3)**3) #prob of 2
+(2/3)**4 # prob of 4
+
+
+
+
+```
+
+$$\begin{array}{|c|c|c|}
+\hline
+\text{X} & \text{outcomes from S} & f(X) \\
+\hline
+-4 & 1 & 0.01234568 \\
+-2 & 4 & 0.09876543   \\
+0  & 6 & 0.2962963  \\
+2  & 4 & 0.3950617   \\
+4  & 1 & 0.1975309 \\
+\hline
+\end{array}
+$$
+Since the probability of the outcome being right increased, the probability of ending up with a larger number also increase. The most likely outcome is now ending up at x = 2 after 4 trials. we are still assuming that each event is independent and the probabilites stay constant at 1/3 for left and 2/3 for right. This is still a binomial distribution which makes calculating the probabilites with the above formulas in the code chunk possible.
+
+
+```{r}
+library(tidyverse)
+
+
+bud <- tibble(
+  x = c(-4,-2,0,2,4),
+  f = c(0.01234568, 0.09876543,0.2962963,0.3950617,0.1975309)
+)
+
+# make probability histogram
+ggplot(data = bud,
+mapping = aes(x=x, y=f) ) +
+geom_col(width = 1, fill = "gold", color = "purple", alpha = 0.5)+
+labs(x = "ending x", y = "probability", title = "unequal probability histogram")
+
+```
+
+
+4. (Discrete Uniform) Suppose X is a discrete uniform random variable on the integers 1, 2, . . . , n, that is,
+it has PMF
+fX (x) = P (X = x) = k, x = 1, 2, . . . , n
+where k is some unknown number.
+
+a. Find k.
+
+
+$$\sum_{x=1}^{n} P(X = x) = 1 = \sum_{x=1}^{n} k$$
+
+
+$$kn = 1$$
+$$k = 1/n$$
+
+
+b. Define the random variable Y = −X Write the PMF of Y along with a brief explanation.
+
+fY (y) = P (Y = y) = k = 1/n, y = -1, -2, . . . , -n
+
+since Y = -X all the values of Y will just become the negative version of x
+
+

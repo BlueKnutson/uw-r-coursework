@@ -1,0 +1,75 @@
+---
+title: "SOC sentiment"
+author: "Blue"
+date: "2023-07-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+#create dataset withone row for each sentiment
+get_sentiments("afinn")
+sentiments_scores <- tidy_comments %>%
+  group_by(sentiment) %>%
+  summarise(mean_score = mean(score, na.rm=T))
+
+cc_alltime_reddit <-read_csv("the-reddit-climate-change-dataset")
+
+tidy_cc<- cc_alltime_reddit %>%
+  unnest_tokens(word,title)%>%
+  anti_join(stop_words)
+
+afinn <-tidy_cc %>%
+  inner_join(get_sentiments("afinn"))%>%
+  group_by(index = created_utc %/% 604800)%>%
+  summarise(sentiment = sum(value))%>%
+  mutate(method = "AFINN")
+
+#words of interest
+cape_town_words <- c("cape town", 
+                     "Cape Town",
+                     "water crisis",
+                     "Water Crisis")
+library(stringr)
+
+#limite reddit data to just cape town posts
+cape_town_posts <- cc_alltime_reddit %>%
+  filter(str_detect(title, paste(cape_town_words, collapse = "|")
+                    ))
+
+tidy_cape_town <- cape_town_posts%>%
+  unnest_tokens(word, title) %>%
+  anti_join(stop_words)
+
+afinn_ct <- tody_cape_town %>%
+  inner_join(get_sentiments("afinn")) %>%
+  group_by(index = created_utc %/% 604800) %>%
+  summarise(sentiment = sum(value))%>%
+  mutate(method = "AFINN")
+
+ggplot(afinn_ct, aes(index, sentiment, fill = method))+
+  geom_col()
+
+
+
+```
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

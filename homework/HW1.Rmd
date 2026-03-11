@@ -1,0 +1,47 @@
+---
+title: "Homework 1 394"
+author: "Blue"
+date: "2025-01-20"
+output: html_document
+---
+Question 1:
+
+it is incorrect because there are 4 equally likely outcomes: HH, HT, TH and TT. the order in which the heads 
+or tails comes up matters. The real probability of getting at least one head in 2 tosses is 3/4.
+
+Question 2: 
+
+$$P(A) = 0.10, P(B) = 0.15$$, and $$P(A ∩ B) = 0.015 $$we want $$P(A^c \cap B^c)$$
+
+$$1-P(A) + p(B) - P(A\cap B) = A^c \cap B^c)$$
+$$1- .1 + .15 - .015 = .765 $$ .765 is the probability that the flight goes safely
+
+Question 3: For two events A and B with P(A) = 0.5 and P(B) = 0.8, what are the largest and smallest possible
+values for P(A ∩ B)? Be sure to show your work and explain the steps, referring to results from our
+notes.
+
+the largest value for P(A ∩ B) is .5 since A could be completely inside B and that's the most overlap there could be.
+The smallest value for P(A ∩ B) is .3 since B already takes up .8 so there is only .2 left for A to take so the remainging .3 must be overlapped with A.
+
+Question 4: Three events A, B and C are defined in a sample space. Show that
+If we copy and paste this question into ChatGPT, you get the following answer. Explain what’s wrong
+with the proof.
+What wrong with chatGPT's proof is that it assumes there is double lapovers and triple lapovers together, if there was only triple lapovers this proof would be wrong because then the equation would be : 
+$$P(A ∪ B ∪ C) = P(A) + P(B) + P(C) + P(A ∩ B ∩ C)$$
+and if that's true then $$P(A ∪ B ∪ C)>=P(A) + P(B) + P(C)$$ since $$P(A ∩ B ∩ C)$$ may not be 0.
+$$P(A ∪ B ∪ C) = P(A ∪ B ∪ C)$$
+$$P(A ∪ B ∪ C) = P((A)\cup (B ∪ C))$$
+$$P(A)+ P(B\cup C) - P(A)\cap(B ∪ C))$$
+$$P(A) + P(B) + P(C) - P(B\cup C)- P(A)\cap(B ∪ C))$$
+since probabilities are non negative, $$P(A ∪ B ∪ C)<=P(A) + P(B) + P(C)$$
+
+c. Suppose we are given that P(A) = 0.2, P(B) = 0.1 and P(C) = 0.3. What is the smallest possible
+value for $$P ((A ∪ B ∪ C)^c$$
+
+$$.2+.1+.3 = .6$$ 
+$$1-.6 = .4$$
+if all of the events are disjoin then $$P ((A ∪ B ∪ C)$$ is .6 and this is the maximum number for that since they don't overlap. since 
+$$P ((A ∪ B ∪ C)^c = 1- P ((A ∪ B ∪ C)$$, the smallest possible value us .4.
+
+
+

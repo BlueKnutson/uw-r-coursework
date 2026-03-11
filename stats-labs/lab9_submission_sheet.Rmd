@@ -1,0 +1,153 @@
+---
+title: "LAB 9 Submission sheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+Modify this file only to add your answers. Please, do not delete any code from this file.
+
+```{r load-packages, echo=FALSE, message=FALSE, results = "hide"}
+if(!require("tidyverse")) install.packages("tidyverse")
+if(!require("openintro")) install.packages("openintro")
+if(!require("statsr")) install.packages("statsr")
+if(!require("broom")) install.packages("broom")
+library(tidyverse)
+library(openintro)
+library(statsr)
+library(broom)
+library(infer)
+
+us_adults <- tibble(
+  climate_change_affects = c(rep("Yes", 62000), rep("No", 38000))
+)
+
+set.seed(1)
+n <- 60
+samp <- us_adults %>%
+  sample_n(size = n)
+
+yrbss <- yrbss %>% 
+  mutate(physical_3plus = if_else(physically_active_7d > 2, "yes", "no"))  %>%
+  na.exclude()
+
+obs_diff <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+
+null_dist <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+
+t_obs <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  calculate(stat = "t", order = c("yes", "no"))
+
+t_dist <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  assume(distribution = "t")
+```
+
+### Question 1
+
+<!---- Answer to Question 1 starts here ----->
+
+Write here your answer to question 1. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question1}
+# Insert Code Here
+
+samp %>%
+  specify(response = climate_change_affects, success = "Yes") %>%
+  generate(reps = 1000, type = "bootstrap") %>%
+  calculate(stat = "prop") %>%
+  get_ci(level = 0.90)
+
+```
+
+
+
+<!---- Answer to Question 1 ends here ----->
+
+
+### Question 2
+
+<!---- Answer to Question 2 starts here ----->
+
+Write here your answer to question 2. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question2}
+# Insert Code Here
+
+
+
+```
+
+the CI using the central limit theorom is (0.2140537 0.4526129) and using the bootstrap it's (0.55	0.7833333) so the boot strap was higher than the central limit theorom.
+<!---- Answer to Question 2 ends here ----->
+
+
+### Question 3
+
+<!---- Answer to Question 3 starts here ----->
+
+Write here your answer to question 3. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question3}
+# Insert Code Here
+
+
+
+```
+
+H(0): mu(no) - mu(yes) = 0
+
+H(A): mu(no)- mu(yes) != 0
+<!---- Answer to Question 3 ends here ----->
+
+
+
+
+### Question 4
+
+<!---- Answer to Question 4 starts here ----->
+
+We observe a value more extreme than the observed value with a probability of 2*p for a two tailed distribution using the null distribution .  This relates to the p value because that probability is 2 times the p value. p value = values more extreme than observed/ value in null. In this case there are no values more extreme than the P value so we don't observe any greater than the P value.
+
+Write here your answer to question 4. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question4}
+# Insert Code Here
+
+
+
+```
+
+
+<!---- Answer to Question 4 ends here ----->
+
+
+
+### Question 5
+
+<!---- Answer to Question 5 starts here ----->
+
+Write here your answer to question 5. Write the code, if any, in the chunk, and comments/interpretations below the chunk.
+
+```{r question5}
+# Insert Code Here
+
+
+
+```
+
+The permutation model computes the p value off of the raw data while the theoretical model converts to the t distribution to compute the p value. I prefer the theoretical model beacause it allows us to get a better estimate of the p value since the permutation method gave us a p value of 0 which is just false under a normal distrbution while the theoretical model was able to give a more realisitc answer.
+<!---- Answer to Question 5 ends here ----->
+
+
+
+
+
